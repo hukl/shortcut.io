@@ -1,6 +1,18 @@
 {"1.1.0",
 [{<<"cowboy">>,{pkg,<<"cowboy">>,<<"2.6.1">>},0},
  {<<"cowlib">>,{pkg,<<"cowlib">>,<<"2.7.0">>},1},
+ {<<"etest">>,
+  {git,"git://github.com/wooga/etest.git",
+       {ref,"1b17d48304803d5157dde2e04c6df822f614283e"}},
+  0},
+ {<<"etest_http">>,
+  {git,"git://github.com/wooga/etest_http.git",
+       {ref,"5cd35631e9051989abe0b9268ab46f5a69b4a8ed"}},
+  0},
+ {<<"jiffy">>,
+  {git,"git://github.com/davisp/jiffy.git",
+       {ref,"ee8b48cb448a999e1fddbb5e2e32e7dfe33acf5c"}},
+  1},
  {<<"ranch">>,{pkg,<<"ranch">>,<<"1.7.1">>},1}]}.
 [
 {pkg_hash,[

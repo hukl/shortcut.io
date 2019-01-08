@@ -19,15 +19,7 @@ start(_StartType, _StartArgs) ->
     application:start(ranch),
     application:ensure_all_started(cowboy),
 
-
-    Dispatch = cowboy_router:compile([
-        {'_', [
-            {"/", scio_default_handler, []}
-        ]}
-    ]),
-    {ok, _} = cowboy:start_clear(http, [{port, 8080}], #{
-        env => #{dispatch => Dispatch}
-    }),
+    initialize_cowboy(),
 
     scio_sup:start_link().
 
@@ -39,3 +31,16 @@ stop(_State) ->
 %%====================================================================
 %% Internal functions
 %%====================================================================
+
+initialize_cowboy() ->
+    Dispatch = cowboy_router:compile([
+        {'_', [
+            {'_', scio_default_handler, []}
+        ]}
+    ]),
+
+    {ok, Port} = application:get_env(scio, http_port),
+
+    {ok, _} = cowboy:start_clear(http, [{port, Port}], #{
+        env => #{dispatch => Dispatch}
+    }).

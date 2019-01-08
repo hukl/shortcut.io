@@ -4,18 +4,15 @@
 
 
 init(Request, State) ->
-    handle_request(Request, State).
+    parse_request(Request, State).
 
 
 % ##############################################################################
 % # Request Handlers                                                           #
 % ##############################################################################
 
-handle_request(Request, State) ->
-    logger:info("HELLLLO"),
-    Response = cowboy_req:reply(200, #{
-        <<"content-type">> => <<"text/plain">>
-    }, <<"Hello World!">>, Request),
+parse_request(#{ path := Path } = Request, State) ->
+    Response = handle_request(Path, Request),
 
     {ok, Response, State}.
 
@@ -23,4 +20,30 @@ handle_request(Request, State) ->
 % # Internal API                                                               #
 % ##############################################################################
 
+handle_request(<<"/">>, Request) ->
+    Body = <<"Hello World">>,
+    cowboy_req:reply(
+      200,
+      #{<<"content-type">> => <<"text/plain">>},
+      Body,
+      Request
+    );
 
+handle_request(<<"/health">>, Request) ->
+    Body = <<"OK">>,
+    cowboy_req:reply(
+      200,
+      #{<<"content-type">> => <<"text/plain">>},
+      Body,
+      Request
+    );
+
+handle_request(_, Request) ->
+    Body = <<"NOT FOUND">>,
+
+    cowboy_req:reply(
+      404,
+      #{<<"content-type">> => <<"text/plain">>},
+      Body,
+      Request
+    ).
