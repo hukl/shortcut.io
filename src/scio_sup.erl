@@ -31,8 +31,23 @@ start_link() ->
 %% Before OTP 18 tuples must be used to specify a child. e.g.
 %% Child :: {Id,StartFunc,Restart,Shutdown,Type,Modules}
 init([]) ->
-    {ok, {{one_for_all, 0, 1}, []}}.
+    Children = [
+        pg_poolboy_spec()
+    ],
+
+    {ok, {{one_for_all, 0, 1}, Children}}.
 
 %%====================================================================
 %% Internal functions
 %%====================================================================
+
+
+pg_poolboy_spec() ->
+    {ok, Pools} = scio_config:db(),
+    [DefaultSpec|_] = lists:map(fun({Name, SizeArgs, WorkerArgs}) ->
+        PoolArgs = [{name, {local, Name}},
+                    {worker_module, scio_sql_worker}] ++ SizeArgs,
+        poolboy:child_spec(Name, PoolArgs, WorkerArgs)
+    end, Pools),
+
+    DefaultSpec.

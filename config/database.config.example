@@ -1,0 +1,14 @@
+{pg_pools, [
+    {development, [
+        {pg, [
+            {size, 10},
+            {max_overflow, 20}
+        ],
+        [
+            {hostname, "localhost"},
+            {database, "somedb"},
+            {username, "someuser"},
+            {password, "somepassword"}
+        ]}
+    ]}
+]}.
