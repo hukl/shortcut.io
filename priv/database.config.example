@@ -1,4 +1,4 @@
-{pg_pools, [
+[
     {development, [
         {pg, [
             {size, 10},
@@ -8,7 +8,7 @@
             {hostname, "localhost"},
             {database, "somedb"},
             {username, "someuser"},
-            {password, "somepassword"}
+            {password, "somepw"}
         ]}
     ]}
-]}.
+].
