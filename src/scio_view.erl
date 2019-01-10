@@ -2,10 +2,6 @@
 
 -compile(export_all).
 
--define(hello_world, bbmustache:parse_file(view_path("hello_world"))).
-
-
-
 template_to_module(TemplateName) ->
     % Define module
     ModName = erlang:list_to_atom(TemplateName),
