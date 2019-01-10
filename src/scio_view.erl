@@ -40,10 +40,10 @@ template_to_module(TemplateName) ->
     ),
 
     % Define only clause of the function
-    Clause   =  erl_syntax:clause([Var],[],[Body]),
+    Clause =  erl_syntax:clause([Var],[],[Body]),
 
     % Define the function body
-    Function =  erl_syntax:function(erl_syntax:atom(render), [Clause]),
+    Function     = erl_syntax:function(erl_syntax:atom(render), [Clause]),
     FunctionForm = erl_syntax:revert(Function),
 
     % Compile and load it into runtime
@@ -56,7 +56,3 @@ view_path(Name) ->
 
 render(View, Content) ->
     bbmustache:compile(View, Content).
-
-
-hello_world(Content) ->
-    render(?hello_world, Content).
