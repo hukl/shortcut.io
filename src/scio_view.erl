@@ -36,18 +36,20 @@ template_to_module(TemplateName) ->
     % Define render function body and pass in the template tuple converted to
     % abstract representation
     Body = erl_syntax:application(
-        erl_syntax:module_qualifier(erl_syntax:atom(bbmustache), erl_syntax:atom(compile)),[erl_syntax:abstract(Template), Var]
+        erl_syntax:module_qualifier(erl_syntax:atom(bbmustache),
+        erl_syntax:atom(compile)),
+        [erl_syntax:abstract(Template), Var]
     ),
 
-    % Define only clause of the function
-    Clause =  erl_syntax:clause([Var],[],[Body]),
+    % Define the only clause of the function
+    Clause =  erl_syntax:clause([Var], [], [Body]),
 
     % Define the function body
     Function     = erl_syntax:function(erl_syntax:atom(render), [Clause]),
     FunctionForm = erl_syntax:revert(Function),
 
     % Compile and load it into runtime
-    {ok, Mod, Bin} = compile:forms([ModForm,ExportForm, FunctionForm]),
+    {ok, Mod, Bin} = compile:forms([ModForm, ExportForm, FunctionForm]),
     code:load_binary(Mod, [], Bin).
 
 view_path(Name) ->
