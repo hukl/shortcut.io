@@ -1,4 +1,4 @@
--module(fc_config_test).
+-module(scio_config_test).
 
 
 -compile(export_all).

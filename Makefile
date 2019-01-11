@@ -15,3 +15,6 @@ shell:
 
 dev:
 	rebar3 release && _build/default/rel/development/bin/development console
+
+dialyzer:
+	rebar3 dialyzer

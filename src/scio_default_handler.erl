@@ -21,29 +21,32 @@ parse_request(#{ path := Path } = Request, State) ->
 % ##############################################################################
 
 handle_request(<<"/">>, Request) ->
-    Body = <<"Hello World">>,
+    Body = hello_world_view:render(
+        #{<<"greeting">> => <<"hello world">>}
+    ),
+
     cowboy_req:reply(
-      200,
-      #{<<"content-type">> => <<"text/plain">>},
-      Body,
-      Request
+        200,
+        #{<<"content-type">> => <<"text/html">>},
+        Body,
+        Request
     );
 
 handle_request(<<"/health">>, Request) ->
     Body = <<"OK">>,
     cowboy_req:reply(
-      200,
-      #{<<"content-type">> => <<"text/plain">>},
-      Body,
-      Request
+        200,
+        #{<<"content-type">> => <<"text/plain">>},
+        Body,
+        Request
     );
 
 handle_request(_, Request) ->
     Body = <<"NOT FOUND">>,
 
     cowboy_req:reply(
-      404,
-      #{<<"content-type">> => <<"text/plain">>},
-      Body,
-      Request
+        404,
+        #{<<"content-type">> => <<"text/plain">>},
+        Body,
+        Request
     ).
