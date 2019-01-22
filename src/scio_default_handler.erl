@@ -38,8 +38,8 @@ handle_request([<<"users">>|Path], Request) ->
     scio_users_handler:handle_request(Path, Request);
 
 
-handle_request(<<"/health">>, _Request) ->
-    <<"OK">>;
+handle_request([<<"health">>], _Request) ->
+    {ok, 200, {}, <<"OK">>};
 
 handle_request(_, Request) ->
     Body = <<"NOT FOUND">>,
