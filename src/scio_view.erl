@@ -1,6 +1,7 @@
 -module(scio_view).
 
 -compile(export_all).
+-compile(nowarn_export_all).
 
 
 load_templates() ->

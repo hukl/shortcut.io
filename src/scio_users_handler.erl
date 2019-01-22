@@ -1,6 +1,6 @@
 -module(scio_users_handler).
 
--compile(export_all).
+-export([handle_request/2]).
 
 
 handle_request([], _Request) ->
