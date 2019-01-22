@@ -5,7 +5,7 @@
  {<<"epgsql">>,{pkg,<<"epgsql">>,<<"4.2.1">>},0},
  {<<"etest">>,
   {git,"git://github.com/wooga/etest.git",
-       {ref,"1b17d48304803d5157dde2e04c6df822f614283e"}},
+       {ref,"d32ced786ddd67c42c5b63cb807e886dd139f560"}},
   0},
  {<<"etest_http">>,
   {git,"git://github.com/wooga/etest_http.git",
