@@ -37,6 +37,7 @@ stop(_State) ->
 initialize_cowboy() ->
     Dispatch = cowboy_router:compile([
         {'_', [
+            {"/static/[...]", cowboy_static, {priv_dir, scio, "static"}},
             {'_', scio_default_handler, []}
         ]}
     ]),

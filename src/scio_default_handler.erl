@@ -2,44 +2,41 @@
 
 -export([init/2]).
 
+-define(PATH_SEPARATOR, binary:compile_pattern(<<"/">>)).
+-define(PATH_OPTIONS,   [trim_all, global]).
 
-init(Request, State) ->
-    parse_request(Request, State).
+init(#{ path := Path } = Request, State) ->
+    PathSegments = binary:split(Path, ?PATH_SEPARATOR, ?PATH_OPTIONS),
+
+    {ok, Status, Headers, Body} = handle_request(PathSegments, Request),
+
+    Response = render_html(Status, Headers, Body, Request),
+
+    {ok, Response, State}.
 
 
 % ##############################################################################
 % # Request Handlers                                                           #
 % ##############################################################################
 
-parse_request(#{ path := Path } = Request, State) ->
-    Response = handle_request(Path, Request),
-
-    {ok, Response, State}.
-
-% ##############################################################################
-% # Internal API                                                               #
-% ##############################################################################
-
-handle_request(<<"/">>, Request) ->
-    Body = hello_world_view:render(
-        #{<<"greeting">> => <<"hello world">>}
-    ),
-
-    cowboy_req:reply(
-        200,
-        #{<<"content-type">> => <<"text/html">>},
-        Body,
-        Request
+handle_request([<<"/">>], _Request) ->
+    landing_page_view:render(
+        #{
+             <<"greeting">> => <<"hello world">>,
+             <<"names">>    => [
+                #{<<"name">> => <<"alice">>},
+                #{<<"name">> => <<"bob">>}
+            ]
+        }
     );
 
-handle_request(<<"/health">>, Request) ->
-    Body = <<"OK">>,
-    cowboy_req:reply(
-        200,
-        #{<<"content-type">> => <<"text/plain">>},
-        Body,
-        Request
-    );
+
+handle_request([<<"users">>, Path], Request) ->
+    scio_users_handler:handle_request(Path, Request);
+
+
+handle_request(<<"/health">>, _Request) ->
+    <<"OK">>;
 
 handle_request(_, Request) ->
     Body = <<"NOT FOUND">>,
@@ -48,5 +45,22 @@ handle_request(_, Request) ->
         404,
         #{<<"content-type">> => <<"text/plain">>},
         Body,
+        Request
+    ).
+
+
+% ##############################################################################
+% # Internal API                                                               #
+% ##############################################################################
+
+render_html(Status, {} = _Headers, Body, Request) ->
+    Html = layout_view:render(
+        #{<<"body">> => Body}
+    ),
+
+    cowboy_req:reply(
+        Status,
+        #{<<"content-type">> => <<"text/html">>},
+        Html,
         Request
     ).
