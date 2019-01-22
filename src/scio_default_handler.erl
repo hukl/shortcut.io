@@ -7,6 +7,7 @@
 
 init(#{ path := Path } = Request, State) ->
     PathSegments = binary:split(Path, ?PATH_SEPARATOR, ?PATH_OPTIONS),
+    logger:error("Path: ~p~n", [PathSegments]),
 
     {ok, Status, Headers, Body} = handle_request(PathSegments, Request),
 
@@ -19,8 +20,8 @@ init(#{ path := Path } = Request, State) ->
 % # Request Handlers                                                           #
 % ##############################################################################
 
-handle_request([<<"/">>], _Request) ->
-    landing_page_view:render(
+handle_request([], _Request) ->
+    Body = landing_page_view:render(
         #{
              <<"greeting">> => <<"hello world">>,
              <<"names">>    => [
@@ -28,10 +29,12 @@ handle_request([<<"/">>], _Request) ->
                 #{<<"name">> => <<"bob">>}
             ]
         }
-    );
+    ),
+
+    {ok, 200, {}, Body};
 
 
-handle_request([<<"users">>, Path], Request) ->
+handle_request([<<"users">>|Path], Request) ->
     scio_users_handler:handle_request(Path, Request);
 
 
