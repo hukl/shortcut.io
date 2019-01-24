@@ -8,7 +8,9 @@ handle_request(<<"GET">>, [], _Request) ->
 
 
 handle_request(<<"POST">>, [], Request) ->
-    {ok, 302, #{<<"location">> => <<"http://localhost:9090/">>}, <<"CREATE">>};
+    {ok, Data, RequestWithBody} = cowboy_req:read_body(Request),
+    io:format("DATA ~p~n", [Data]),
+    {ok, 303, #{<<"location">> => <<"/">>}, <<"CREATE">>};
 
 
 handle_request(<<"GET">>, [<<"new">>], _Request) ->

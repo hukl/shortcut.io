@@ -32,7 +32,10 @@ test_submitting_valid_form_should_create_user() ->
         <<"password">> => <<"dreimalraten">>
     },
 
+
     Res = ?perform_post(Url, Headers, Body, maps:to_list(Queries)),
     ?assert_header("location", Res),
-    ?assert_header_value("location", "http://localhost:9090/", Res),
-    ?assert_status(302, Res).
+    ?assert_header_value("location", "/", Res),
+    ?assert_status(303, Res),
+
+    ?assert_equal({ok, 1}, scio_user:count()).
