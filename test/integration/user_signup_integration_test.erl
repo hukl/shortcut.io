@@ -11,6 +11,9 @@
 before_suite() ->
     application:ensure_all_started(scio).
 
+before_test() ->
+   scio_sql:flush_db().
+
 after_suite() ->
     application:stop(scio).
 

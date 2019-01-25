@@ -2,13 +2,49 @@
 
 -export([
     first/0,
-    count/0
+    count/0,
+    create/1
 ]).
 
+-include("scio.hrl").
+
+
+% CRUD
+
+-spec create(map()) -> {'ok', #user{}} | {'error', tuple()}.
+create(#{
+    username := Username,
+    email    := Email,
+    password := Password} = _Params) ->
+
+    Query = "INSERT INTO users "
+             "    (username, email, password) "
+             "VALUES  "
+             "    ($1, $2, $3) "
+             "RETURNING id, uuid, username, email, password;",
+
+    case scio_sql:equery(pg, Query, [Username, Email, Password]) of
+        {ok, _Count, _Colums, [{Id, Uuid, Username, Email, Password}]}->
+
+            User = #user{
+                id       = Id,
+                uuid     = Uuid,
+                username = Username,
+                email    = Email,
+                password = Password
+            },
+
+            {ok, User};
+        {error, Error}
+            -> {error, Error}
+    end.
+
+% Helpers
 
 first() ->
     geil.
 
+-spec count() -> {'ok', integer()} | {'error', tuple()}.
 count() ->
     Query = "SELECT count(id) FROM users;",
 

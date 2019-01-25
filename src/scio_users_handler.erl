@@ -8,7 +8,7 @@ handle_request(<<"GET">>, [], _Request) ->
 
 
 handle_request(<<"POST">>, [], Request) ->
-    {ok, Data, RequestWithBody} = cowboy_req:read_body(Request),
+    {ok, Data, _RequestWithBody} = cowboy_req:read_body(Request),
     io:format("DATA ~p~n", [Data]),
     {ok, 303, #{<<"location">> => <<"/">>}, <<"CREATE">>};
 
