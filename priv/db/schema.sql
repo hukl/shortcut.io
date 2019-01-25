@@ -112,21 +112,21 @@ ALTER TABLE ONLY public.users
 -- Name: users_email_idx; Type: INDEX; Schema: public; Owner: shortcut
 --
 
-CREATE INDEX users_email_idx ON public.users USING btree (email);
+CREATE UNIQUE INDEX users_email_idx ON public.users USING btree (email);
 
 
 --
 -- Name: users_username_idx; Type: INDEX; Schema: public; Owner: shortcut
 --
 
-CREATE INDEX users_username_idx ON public.users USING btree (username);
+CREATE UNIQUE INDEX users_username_idx ON public.users USING btree (username);
 
 
 --
 -- Name: users_uuid_idx; Type: INDEX; Schema: public; Owner: shortcut
 --
 
-CREATE INDEX users_uuid_idx ON public.users USING btree (uuid);
+CREATE UNIQUE INDEX users_uuid_idx ON public.users USING btree (uuid);
 
 
 --
