@@ -18,3 +18,18 @@ dev:
 
 dialyzer:
 	rebar3 dialyzer
+
+schema_dump:
+	pg_dump -h localhost -U shortcut -c shortcut_dev > priv/db/schema.sql
+
+schema_load: schema_load_dev schema_load_test
+
+schema_load_dev:
+	psql -h localhost -d shortcut_dev < priv/db/schema.sql
+
+schema_load_test:
+	psql -h localhost -d shortcut_test < priv/db/schema.sql
+
+schema_load_production:
+	psql -h localhost -d shortcut_production < priv/db/schema.sql
+
