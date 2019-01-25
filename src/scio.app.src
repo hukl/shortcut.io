@@ -6,6 +6,8 @@
   {applications,
    [kernel,
     stdlib,
+    crypto,
+    bcrypt,
     sasl,
     cowboy,
     poolboy,
