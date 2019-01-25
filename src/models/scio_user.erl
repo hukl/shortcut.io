@@ -11,11 +11,11 @@
 
 % CRUD
 
--spec create(map()) -> {'ok', #user{}} | {'error', tuple()}.
+-spec create(#{ bitstring() => bitstring() }) -> {'ok', #user{}} | {'error', tuple()}.
 create(#{
-    username := Username,
-    email    := Email,
-    password := Password} = _Params) ->
+    <<"username">> := Username,
+    <<"email">>    := Email,
+    <<"password">> := Password} = _Params) ->
 
     {ok, CryptedPassword} = scio_utils:crypt_password(Password),
 

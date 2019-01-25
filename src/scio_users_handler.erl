@@ -8,8 +8,12 @@ handle_request(<<"GET">>, [], _Request) ->
 
 
 handle_request(<<"POST">>, [], Request) ->
-    {ok, Data, _RequestWithBody} = cowboy_req:read_body(Request),
-    io:format("DATA ~p~n", [Data]),
+    {ok, Json, _RequestWithBody} = cowboy_req:read_body(Request),
+
+    Params = jiffy:decode(Json, [return_maps]),
+
+    {ok, _User} = scio_user:create(Params),
+
     {ok, 303, #{<<"location">> => <<"/">>}, <<"CREATE">>};
 
 

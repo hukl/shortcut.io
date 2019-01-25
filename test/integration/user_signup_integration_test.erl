@@ -27,16 +27,17 @@ test_signup_page() ->
 
 test_submitting_valid_form_should_create_user() ->
     Url     = "http://localhost:9090/users/",
-    Body    = <<>>,
-    Headers = [],
-    Queries = #{
-        <<"username">> => <<"Perter">>,
+    Headers = [{"content-type", "application/json"}],
+    Params  = #{
+        <<"username">> => <<"Peter">>,
         <<"email">>    => <<"foo@bar.com">>,
         <<"password">> => <<"dreimalraten">>
     },
+    Json = jiffy:encode(Params),
 
 
-    Res = ?perform_post(Url, Headers, Body, maps:to_list(Queries)),
+    Res = ?perform_post(Url, Headers, Json, []),
+
     ?assert_header("location", Res),
     ?assert_header_value("location", "/", Res),
     ?assert_status(303, Res),

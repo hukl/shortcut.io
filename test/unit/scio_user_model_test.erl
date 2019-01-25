@@ -23,9 +23,9 @@ test_creating_a_user() ->
     Password = <<"SicherSicher23">>,
 
     Params = #{
-        username => <<"Peter">>,
-        email    => <<"foo@bar.com">>,
-        password => Password
+        <<"username">> => <<"Peter">>,
+        <<"email">>    => <<"foo@bar.com">>,
+        <<"password">> => Password
     },
 
     {ok, User} = scio_user:create(Params),
