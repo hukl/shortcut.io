@@ -147,8 +147,6 @@ validate_timestamp({ok, #session{ created_at = CreatedAt } = Session }) ->
     Age    = Now - CreatedAt,
     MaxAge = 30 * 24 * 60 * 60,
 
-    io:format("AGES ~p~n~p~n", [Age, MaxAge]),
-
     case Age < MaxAge of
         true  -> {ok, Session};
         false -> {error, expired}
