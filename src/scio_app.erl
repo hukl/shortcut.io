@@ -45,5 +45,6 @@ initialize_cowboy() ->
     {ok, Port} = application:get_env(http_port),
 
     {ok, _} = cowboy:start_clear(http, [{port, Port}], #{
-        env => #{dispatch => Dispatch}
+        env         => #{dispatch => Dispatch},
+        middlewares => [cowboy_router, scio_session_handler, cowboy_handler]
     }).
