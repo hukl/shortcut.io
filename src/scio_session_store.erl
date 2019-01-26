@@ -10,7 +10,7 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2,
          code_change/3]).
 
--export([create/1, login/4, remove/1, list/0, find_online_users/1]).
+-export([save/1, find/1, validate/1, login/4, remove/1, list/0, find_online_users/1]).
 
 -include("scio.hrl").
 
@@ -35,12 +35,20 @@ stop() ->
 %% ===================================================================
 
 init([]) ->
-    ets:new(users, [set, named_table, public]),
+    ets:new(sessions, [set, named_table, public]),
     {ok, {}}.
 
 
-handle_call({}, _From, State) ->
-    {reply, ok, State}.
+handle_call({save, Session}, _From, State) ->
+    #session{
+       session_id = SessionId,
+       user_id    = UserId,
+       created_at = CreatedAt
+    } = Session,
+
+    true = ets:insert_new(sessions, {SessionId, UserId, CreatedAt}),
+
+    {reply, {ok, Session}, State}.
 
 handle_cast(stop, State) ->
     {stop, normal, State};
@@ -61,8 +69,52 @@ terminate(_Reason, _State) ->
 %% Public API
 %% ===================================================================
 
-create(_Userid) ->
-    {ok, {}}.
+-spec save(#session{}) -> {'ok', #session{}}.
+save(Session) ->
+    gen_server:call(?MODULE, {save, Session}).
+
+
+
+validate_session(Validations, SessionId) ->
+    ValidationFun = fun
+        % Keep checking while status is ok
+        (Check, {ok, _} = SessionTuple) -> Check(SessionTuple);
+
+        % Early exit if one of the validations failed
+        (_, {error, Reason})   -> {error, Reason}
+    end,
+
+    lists:foldl(
+        ValidationFun,
+        {ok, #session{ session_id = SessionId }},
+        Validations
+    ).
+
+
+-spec validate(bitstring()) ->  { 'ok', #session{} } | { 'error', 'atom' }.
+validate(SessionId) ->
+    Validations = [
+        fun validate_signature/1,
+        fun validate_existence/1,
+        fun validate_timestamp/1
+    ],
+
+    validate_session(Validations, SessionId).
+
+-spec find(bitstring()) -> { 'ok', #session{} } | { 'error', atom() }.
+find(SessionId) ->
+     case ets:lookup(sessions, SessionId) of
+        [] ->
+            {error, not_found};
+        [{SessionId, UserId, CreatedAt}] ->
+            Session = #session{
+                session_id = SessionId,
+                user_id    = UserId,
+                created_at = CreatedAt
+            },
+
+            {ok, Session}
+    end.
 
 list() ->
     Result = ets:match(users, {'$1', '$2', '_'}),
@@ -83,10 +135,22 @@ find_online_users(Users) ->
 %% Private API
 %% ===================================================================
 
-% is_user_logged_in(UserUUID) ->
-%     case ets:lookup(users, UserUUID) of
-%         []                 -> false;
-%         [{UserUUID, _, _}] -> true
-%     end.
+validate_signature({ok, #session{ session_id = SessionId }}) ->
+    case scio_session:validate_session_id(SessionId) of
+        true  -> {ok, SessionId};
+        false -> {error, invalid}
+    end.
 
 
+validate_existence({ok, #session{ session_id = SessionId }}) ->
+    find(SessionId).
+
+
+validate_timestamp({ok, #session{ created_at = CreatedAt } = Session }) ->
+    Now           = scio_utils:timestamp(),
+    MaxSessionAge = CreatedAt + (30 * 24 * 60 * 60),
+
+    case MaxSessionAge < Now of
+        true  -> {ok, Session};
+        false -> {error, expired}
+    end.

@@ -1,10 +1,24 @@
 -module(scio_session_test).
 
-
 -compile(export_all).
 
 % Include etest's assertion macros.
 -include_lib("etest/include/etest.hrl").
+
+-include("scio.hrl").
+
+test_new_session() ->
+    User = #user{
+        id       = <<"1">>,
+        uuid     = <<"some-uuid">>,
+        username = <<"Bente">>,
+        password = <<"foo">>,
+        email    = <<"foo@bar.com">>
+    },
+
+    {ok, Session} = scio_session:new(User),
+
+    ?assert_equal(<<"1">>, Session#session.user_id).
 
 
 test_generating_a_session_id() ->
@@ -18,7 +32,6 @@ test_signing_a_session_id() ->
     SignedSession = scio_session:sign_session_id(SessionID, Secret),
 
     ?assert(0 < erlang:size(SignedSession)),
-    ?assert(erlang:is_bitstring(SignedSession)),
 
     % For sha256
     ?assert(32 =:= size(SignedSession)),
