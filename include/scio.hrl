@@ -8,3 +8,10 @@
     email       ::bitstring(),
     password    ::bitstring()
 }).
+
+
+-record(session, {
+    session_id   :: bitstring(),
+    user_id      :: bitstring(),
+    created_at   :: integer()
+}).

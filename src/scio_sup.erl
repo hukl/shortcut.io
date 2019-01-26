@@ -15,6 +15,9 @@
 
 -define(SERVER, ?MODULE).
 
+%% Helper macro for declaring children of supervisor
+-define(CHILD(I, Type), {I, {I, start_link, []}, permanent, 5000, Type, [I]}).
+
 %%====================================================================
 %% API functions
 %%====================================================================
@@ -32,6 +35,7 @@ start_link() ->
 %% Child :: {Id,StartFunc,Restart,Shutdown,Type,Modules}
 init([]) ->
     Children = [
+        ?CHILD(scio_session_store, worker),
         pg_poolboy_spec()
     ],
 

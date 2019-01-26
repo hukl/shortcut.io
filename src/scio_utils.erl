@@ -1,6 +1,21 @@
 -module(scio_utils).
 
--export([crypt_password/1, check_password/2]).
+-export([
+    timestamp/0,
+    timestamp/1,
+    crypt_password/1,
+    check_password/2
+]).
+
+% Wrapper function to make mocking / freezing time in tests easy
+-spec timestamp() -> integer().
+timestamp() ->
+    erlang:system_time(seconds).
+
+-spec timestamp('second' | 'millisecond' | 'microsecond') -> integer().
+timestamp(Unit) ->
+    erlang:system_time(Unit).
+
 
 -spec crypt_password(bitstring()) -> {ok, bitstring()}.
 crypt_password(Password) ->
