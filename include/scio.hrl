@@ -12,6 +12,6 @@
 
 -record(session, {
     session_id   :: bitstring(),
-    user_id      :: bitstring(),
-    created_at   :: integer()
+    user_id    = undefined  :: bitstring() | 'undefined',
+    created_at = undefined  :: integer()   | 'undefined'
 }).

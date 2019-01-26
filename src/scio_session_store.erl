@@ -74,8 +74,14 @@ save(Session) ->
     gen_server:call(?MODULE, {save, Session}).
 
 
+-spec validate(bitstring()) ->  { 'ok', #session{} } | { 'error', atom() }.
+validate(SessionId) ->
+    Validations = [
+        fun validate_signature/1,
+        fun validate_existence/1,
+        fun validate_timestamp/1
+    ],
 
-validate_session(Validations, SessionId) ->
     ValidationFun = fun
         % Keep checking while status is ok
         (Check, {ok, _} = SessionTuple) -> Check(SessionTuple);
@@ -90,16 +96,6 @@ validate_session(Validations, SessionId) ->
         Validations
     ).
 
-
--spec validate(bitstring()) ->  { 'ok', #session{} } | { 'error', 'atom' }.
-validate(SessionId) ->
-    Validations = [
-        fun validate_signature/1,
-        fun validate_existence/1,
-        fun validate_timestamp/1
-    ],
-
-    validate_session(Validations, SessionId).
 
 -spec find(bitstring()) -> { 'ok', #session{} } | { 'error', atom() }.
 find(SessionId) ->
@@ -135,9 +131,9 @@ find_online_users(Users) ->
 %% Private API
 %% ===================================================================
 
-validate_signature({ok, #session{ session_id = SessionId }}) ->
+validate_signature({ok, #session{ session_id = SessionId } = Session}) ->
     case scio_session:validate_session_id(SessionId) of
-        true  -> {ok, SessionId};
+        true  -> {ok, Session};
         false -> {error, invalid}
     end.
 
@@ -147,10 +143,13 @@ validate_existence({ok, #session{ session_id = SessionId }}) ->
 
 
 validate_timestamp({ok, #session{ created_at = CreatedAt } = Session }) ->
-    Now           = scio_utils:timestamp(),
-    MaxSessionAge = CreatedAt + (30 * 24 * 60 * 60),
+    Now    = scio_utils:timestamp(),
+    Age    = Now - CreatedAt,
+    MaxAge = 30 * 24 * 60 * 60,
 
-    case MaxSessionAge < Now of
+    io:format("AGES ~p~n~p~n", [Age, MaxAge]),
+
+    case Age < MaxAge of
         true  -> {ok, Session};
         false -> {error, expired}
     end.
