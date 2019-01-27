@@ -8,7 +8,7 @@
 % etest_http macros
 -include_lib ("etest_http/include/etest_http.hrl").
 
--define(BASE_URL, "http://localhost:9090/").
+-define(BASE_URL, "http://localhost:9090").
 
 before_suite() ->
     application:ensure_all_started(scio).
@@ -61,6 +61,34 @@ test_submitting_valid_form_should_create_user() ->
     ?assert_equal({ok, 1}, scio_user:count()).
 
 
+test_signing_up_with_existing_email_address() ->
+    % create the default user
+    create_user(),
+
+    % then sign up again which should create an error
+    Response = create_user(),
+
+    ?assert_status(400, Response).
+
+
+test_signing_up_with_existing_user_name() ->
+    % create the default user
+    create_user(),
+
+    Url     = ?BASE_URL ++ "/users/",
+    Headers = [{"content-type", "application/json"}],
+    Params  = #{
+        <<"username">> => <<"Peter">>,
+        <<"email">>    => <<"different@address.com">>,
+        <<"password">> => <<"dreimalraten">>
+    },
+    Json = jiffy:encode(Params),
+
+    Response = ?perform_post(Url, Headers, Json, []),
+
+    ?assert_status(400, Response).
+
+
 test_log_in_page() ->
     Url = ?BASE_URL ++ "/sessions/new",
     Res = ?perform_get(Url),
@@ -107,6 +135,7 @@ test_unsuccessful_log_in_with_wrong_password() ->
     ?assert_status(403, Res),
     ?assert_equal({ok, 0}, scio_session_store:count()).
 
+
 test_unsuccessful_log_in_with_wrong_email() ->
     create_user(),
 
@@ -123,3 +152,10 @@ test_unsuccessful_log_in_with_wrong_email() ->
 
     ?assert_status(403, Res),
     ?assert_equal({ok, 0}, scio_session_store:count()).
+
+
+test_not_found() ->
+    Url = ?BASE_URL ++ "/users/bogus_path",
+    Res = ?perform_get(Url),
+
+    ?assert_status(404, Res).

@@ -39,6 +39,9 @@ create(#{
             },
 
             {ok, User};
+        {error, {_, _, _, unique_violation, _, Details}} ->
+            Constraint = proplists:get_value(constraint_name, Details),
+            error_for_constraint(Constraint);
         {error, Error}
             -> {error, Error}
     end.
@@ -92,3 +95,12 @@ count() ->
 -spec verify_password(bitstring(), #user{}) -> boolean().
 verify_password(Password, User) ->
     scio_utils:check_password(Password, User#user.password).
+
+
+-spec error_for_constraint(bitstring()) -> {'error', atom()}.
+error_for_constraint(Constraint) ->
+    case binary:split(Constraint, <<"_">>, [global]) of
+        [_Table, <<"email">>,    _] -> {error, email_already_exists};
+        [_Table, <<"username">>, _] -> {error, username_already_exists};
+        _                           -> {error, unexpected_constraint_error}
+    end.

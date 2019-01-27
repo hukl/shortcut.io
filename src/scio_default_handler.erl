@@ -9,10 +9,6 @@ init(#{ method := Method, path := Path} = Request, State) ->
     PathSegments = binary:split(Path, ?PATH_SEPARATOR, ?PATH_OPTIONS),
     logger:error("Method: ~p Path: ~p~n", [Method, PathSegments]),
 
-    Result = cowboy_req:binding(session, Request),
-    io:format("SESSION ~p~n", [Result]),
-    io:format("PATH ~p~n", [Path]),
-
     {ok, Status, Headers, Body, NewRequest} = handle_request(
         Method, PathSegments, Request
     ),
