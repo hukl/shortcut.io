@@ -3,7 +3,9 @@
 -export([
     first/0,
     count/0,
-    create/1
+    create/1,
+    find_by_email/1,
+    verify_password/2
 ]).
 
 -include("scio.hrl").
@@ -41,6 +43,29 @@ create(#{
             -> {error, Error}
     end.
 
+
+-spec find_by_email(bitstring()) -> {'ok', #user{}} | {'error', term()}.
+find_by_email(Email) ->
+    Query = "SELECT id, uuid, username, email, password "
+            "FROM users "
+            "WHERE email = $1;",
+
+    case scio_sql:equery(pg, Query, [Email]) of
+        {ok, _Colums, [{Id, Uuid, Username, Email, CryptedPassword}]}->
+
+            User = #user{
+                id       = Id,
+                uuid     = Uuid,
+                username = Username,
+                email    = Email,
+                password = CryptedPassword
+            },
+
+            {ok, User};
+        {error, Error}
+            -> {error, Error}
+    end.
+
 % Helpers
 
 first() ->
@@ -58,4 +83,10 @@ count() ->
             {error, Error}
     end.
 
+%% ===================================================================
+%% Helpers
+%% ===================================================================
 
+-spec verify_password(bitstring(), #user{}) -> boolean().
+verify_password(Password, User) ->
+    scio_utils:check_password(Password, User#user.password).

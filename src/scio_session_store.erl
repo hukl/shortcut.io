@@ -10,7 +10,7 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2,
          code_change/3]).
 
--export([save/1, find/1, validate/1, login/4, remove/1, list/0, find_online_users/1]).
+-export([save/1, find/1, count/0, validate/1, login/4, remove/1, list/0, find_online_users/1]).
 
 -include("scio.hrl").
 
@@ -113,14 +113,22 @@ find(SessionId) ->
     end.
 
 list() ->
-    Result = ets:match(users, {'$1', '$2', '_'}),
+    Result = ets:match(sessions, {'$1', '$2', '_'}),
     [{Uuid, Name} || [Uuid, Name] <- Result].
+
+
+count() ->
+   Count = proplists:get_value(size, ets:info(sessions)),
+   {ok, Count}.
+
 
 login(UserUUID, Username, Token, Pid) when is_pid(Pid) ->
     gen_server:call(?MODULE, {login, UserUUID, Username, Token, Pid}).
 
+
 remove(Username) ->
     ok = gen_server:call(?MODULE, {remove, Username}).
+
 
 find_online_users(Users) ->
     Result = ets:select(users, [{{Key,'_', '_'},[],['$_']} || Key <- Users]),

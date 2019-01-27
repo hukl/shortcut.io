@@ -13,17 +13,25 @@
 
 -define(SECRET, <<"mysecret">>).
 
--spec new(#user{}) -> {'ok', #session{}}.
+-spec new(#user{}) -> {'ok', #session{}} | {'error', atom()}.
 new(#user{ id = UserId }) ->
     TimeNow   = scio_utils:timestamp(),
-    SessionId = generate_signed_session_id(?SECRET),
 
-    Session = #session{
-        session_id = SessionId,
-        user_id    = UserId,
-        created_at = TimeNow
-    },
-    {ok, Session}.
+    try
+        SessionId = generate_signed_session_id(?SECRET),
+
+        Session = #session{
+            session_id = SessionId,
+            user_id    = UserId,
+            created_at = TimeNow
+        },
+
+        {ok, Session}
+    catch
+        Error:Reason ->
+            logger:error("Create Session Failed ~p~n~p~n", [Error, Reason]),
+            {error, failed_to_create_session}
+    end.
 
 
 -spec generate_session_id() -> binary().
