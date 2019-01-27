@@ -1,10 +1,16 @@
 -module(scio_config).
 
--export([config_dir/0, db/0, env/0]).
+-export([config_dir/0, db/0, env/0, load_secrets/0]).
 
 
 config_dir() ->
     code:lib_dir(scio, config).
+
+
+load_secrets() ->
+    Path = filename:join([code:priv_dir(scio), "secrets.config"]),
+    {ok, Secrets} = file:consult(Path),
+    application:set_env(scio, secrets, Secrets).
 
 
 env() ->

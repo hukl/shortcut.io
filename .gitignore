@@ -21,3 +21,4 @@ rebar3.crashdump
 database.config
 tags
 coverage
+secrets.config

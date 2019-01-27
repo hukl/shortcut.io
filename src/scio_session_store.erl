@@ -10,7 +10,7 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2,
          code_change/3]).
 
--export([save/1, find/1, count/0, validate/1, login/4, remove/1, list/0, find_online_users/1]).
+-export([save/1, find/1, count/0, validate/1, flush/0, login/4, remove/1, list/0]).
 
 -include("scio.hrl").
 
@@ -48,7 +48,12 @@ handle_call({save, Session}, _From, State) ->
 
     true = ets:insert_new(sessions, {SessionId, UserId, CreatedAt}),
 
-    {reply, {ok, Session}, State}.
+    {reply, {ok, Session}, State};
+
+handle_call({flush}, _From, State) ->
+    ets:delete_all_objects(sessions),
+    {reply, ok, State}.
+
 
 handle_cast(stop, State) ->
     {stop, normal, State};
@@ -129,10 +134,8 @@ login(UserUUID, Username, Token, Pid) when is_pid(Pid) ->
 remove(Username) ->
     ok = gen_server:call(?MODULE, {remove, Username}).
 
-
-find_online_users(Users) ->
-    Result = ets:select(users, [{{Key,'_', '_'},[],['$_']} || Key <- Users]),
-    [{User, Pid} || {User, _, Pid} <- Result].
+flush() ->
+    ok = gen_server:call(?MODULE, {flush}).
 
 
 %% ===================================================================

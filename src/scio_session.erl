@@ -11,14 +11,13 @@
     validate_session_id/2
 ]).
 
--define(SECRET, <<"mysecret">>).
 
 -spec new(#user{}) -> {'ok', #session{}} | {'error', atom()}.
 new(#user{ id = UserId }) ->
     TimeNow   = scio_utils:timestamp(),
 
     try
-        SessionId = generate_signed_session_id(?SECRET),
+        SessionId = generate_signed_session_id(cookie_secret()),
 
         Session = #session{
             session_id = SessionId,
@@ -57,7 +56,7 @@ generate_signed_session_id(Secret) ->
 -spec validate_session_id(bitstring()) -> boolean().
 validate_session_id(SessionIdWithSignature) ->
     try
-        validate_session_id(?SECRET, SessionIdWithSignature)
+        validate_session_id(cookie_secret(), SessionIdWithSignature)
     catch
         Error:Reason ->
             logger:error("Invalid Signature ~p~n~p~n", [Error, Reason]),
@@ -85,4 +84,6 @@ validate_session_id(Secret, SessionIdWithSignature) ->
     end.
 
 
-
+cookie_secret() ->
+    {ok, [Secrets]} = application:get_env(scio, secrets),
+    proplists:get_value(cookie_secret, Secrets).

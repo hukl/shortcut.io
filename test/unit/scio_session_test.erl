@@ -7,6 +7,10 @@
 
 -include("scio.hrl").
 
+before_suite() ->
+    scio_config:load_secrets().
+
+
 test_new_session() ->
     User = #user{
         id       = <<"1">>,
