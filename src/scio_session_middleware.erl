@@ -6,16 +6,26 @@
 -include("scio.hrl").
 
 execute(Req, Env) ->
-    % check if there is a session cookie
-    % if so then validate it and retrieve the session
-    % if that succeeds, put the session into the request binding
-    % {_Binding, Req2} = cowboy_req:binding(session, Req1, Session)
-    % if the checks fail, undefined will be returned when trying to access it
+
+    SessionId = extract_session_id(Req),
+
+    case scio_session_store:validate(SessionId) of
+        {ok, Session} ->
+            Bindings       = maps:get(bindings, Req),
+            NewBindings    = maps:put(session, Session, Bindings),
+            ReqWithSession = maps:put(bindings, NewBindings, Req),
+
+            {ok, ReqWithSession, Env};
+        {error, _} ->
+            {ok, Req, Env}
+    end.
 
 
-    Req1 = cowboy_req:set_resp_cookie(
-        <<"session">>, scio_session:generate_signed_session_id(<<"mysecret">>),
-        Req, #{path => <<"/">>}
-    ),
+extract_session_id(Req) ->
+    Cookies = cowboy_req:parse_cookies(Req),
 
-    {ok, Req1, Env}.
+    case lists:keyfind(<<"session">>, 1, Cookies) of
+        {_, SessioId} -> SessioId;
+        false         -> <<"">>
+    end.
+

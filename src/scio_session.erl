@@ -67,18 +67,22 @@ validate_session_id(SessionIdWithSignature) ->
 
 -spec validate_session_id(bitstring(), bitstring()) -> boolean().
 validate_session_id(Secret, SessionIdWithSignature) ->
-    [SessionId, Signature] = binary:split(SessionIdWithSignature, <<".">>),
+    try
+        [SessionId, Signature] = binary:split(SessionIdWithSignature, <<".">>),
 
-    DecordedSessionId = base64:decode(SessionId),
-    DecodedSignature  = base64:decode(Signature),
+        DecordedSessionId = base64:decode(SessionId),
+        DecodedSignature  = base64:decode(Signature),
 
-       ExpectedSignature = crypto:hmac(
-        sha256,
-        Secret,
-        DecordedSessionId
-    ),
+        ExpectedSignature = crypto:hmac(
+            sha256,
+            Secret,
+            DecordedSessionId
+        ),
 
-    ExpectedSignature =:= DecodedSignature.
+        ExpectedSignature =:= DecodedSignature
+    catch
+        _:_ -> false
+    end.
 
 
 

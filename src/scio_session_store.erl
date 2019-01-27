@@ -69,7 +69,7 @@ terminate(_Reason, _State) ->
 %% Public API
 %% ===================================================================
 
--spec save(#session{}) -> {'ok', #session{}}.
+-spec save(#session{}) -> {'ok', #session{}} | {'error', any()}.
 save(Session) ->
     gen_server:call(?MODULE, {save, Session}).
 

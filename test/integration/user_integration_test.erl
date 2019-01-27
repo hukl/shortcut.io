@@ -87,3 +87,23 @@ test_successful_log_in() ->
     ?assert_header_value("location", "/", Res),
     ?assert_status(303, Res),
     ?assert_equal({ok, 1}, scio_session_store:count()).
+
+
+test_unsuccessful_log_in() ->
+    create_user(),
+
+    Url     = ?BASE_URL ++ "/sessions",
+    Headers = [{"content-type", "application/json"}],
+    Params  = #{
+        <<"email">>    => <<"foo@bar.com">>,
+        <<"password">> => <<"wrongpassword">>
+    },
+
+    Json = jiffy:encode(Params),
+
+    Res  = ?perform_post(Url, Headers, Json, []),
+
+    ?assert_header("location", Res),
+    ?assert_header_value("location", "/sessions/failure", Res),
+    ?assert_status(303, Res),
+    ?assert_equal({ok, 0}, scio_session_store:count()).
