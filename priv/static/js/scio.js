@@ -51,11 +51,11 @@ var Scio = function() {
             headers: {
                 "Content-Type": "application/json",
             },
-            redirect: "manual", // manual, *follow, error
+            redirect: "follow", // manual, *follow, error
             referrer: "no-referrer", // no-referrer, *client
             body: JSON.stringify(data), // body data type must match "Content-Type" header
         })
-            .then(response => response);// parses response to JSON
+            .then(response => response);
     };
 
     this.initialize();
