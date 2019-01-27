@@ -62,8 +62,10 @@ find_by_email(Email) ->
             },
 
             {ok, User};
-        {error, Error}
-            -> {error, Error}
+        {ok, _Colums, []} ->
+            {error, not_found};
+        {error, Error} ->
+            {error, Error}
     end.
 
 % Helpers

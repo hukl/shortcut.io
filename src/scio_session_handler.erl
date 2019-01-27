@@ -12,9 +12,9 @@ handle_request(<<"POST">>, [], Request) ->
 
     case login(Params, Request) of
         {ok, NewRequest} ->
-            {ok, 303, #{<<"location">> => <<"/">>}, <<"Login Success">>, NewRequest};
+            {ok, 201, #{<<"location">> => <<"/">>}, <<"Login Success">>, NewRequest};
         {error, _Reason} ->
-            {ok, 303, #{<<"location">> => <<"/sessions/failure">>}, <<"Login Failure">>, Request}
+            {ok, 403, #{}, <<"Forbidden">>, Request}
     end;
 
 

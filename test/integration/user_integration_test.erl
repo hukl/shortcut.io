@@ -86,11 +86,11 @@ test_successful_log_in() ->
 
     ?assert_header("location", Res),
     ?assert_header_value("location", "/", Res),
-    ?assert_status(303, Res),
+    ?assert_status(201, Res),
     ?assert_equal({ok, 1}, scio_session_store:count()).
 
 
-test_unsuccessful_log_in() ->
+test_unsuccessful_log_in_with_wrong_password() ->
     create_user(),
 
     Url     = ?BASE_URL ++ "/sessions",
@@ -104,7 +104,22 @@ test_unsuccessful_log_in() ->
 
     Res  = ?perform_post(Url, Headers, Json, []),
 
-    ?assert_header("location", Res),
-    ?assert_header_value("location", "/sessions/failure", Res),
-    ?assert_status(303, Res),
+    ?assert_status(403, Res),
+    ?assert_equal({ok, 0}, scio_session_store:count()).
+
+test_unsuccessful_log_in_with_wrong_email() ->
+    create_user(),
+
+    Url     = ?BASE_URL ++ "/sessions",
+    Headers = [{"content-type", "application/json"}],
+    Params  = #{
+        <<"email">>    => <<"foo@wrong.com">>,
+        <<"password">> => <<"dreimalraten">>
+    },
+
+    Json = jiffy:encode(Params),
+
+    Res  = ?perform_post(Url, Headers, Json, []),
+
+    ?assert_status(403, Res),
     ?assert_equal({ok, 0}, scio_session_store:count()).

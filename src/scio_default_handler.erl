@@ -11,6 +11,7 @@ init(#{ method := Method, path := Path} = Request, State) ->
 
     Result = cowboy_req:binding(session, Request),
     io:format("SESSION ~p~n", [Result]),
+    io:format("PATH ~p~n", [Path]),
 
     {ok, Status, Headers, Body, NewRequest} = handle_request(
         Method, PathSegments, Request
