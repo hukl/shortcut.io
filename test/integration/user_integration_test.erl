@@ -56,7 +56,7 @@ test_submitting_valid_form_should_create_user() ->
 
     ?assert_header("location", Res),
     ?assert_header_value("location", "/", Res),
-    ?assert_status(303, Res),
+    ?assert_status(201, Res),
 
     ?assert_equal({ok, 1}, scio_user:count()).
 
@@ -68,7 +68,8 @@ test_signing_up_with_existing_email_address() ->
     % then sign up again which should create an error
     Response = create_user(),
 
-    ?assert_status(400, Response).
+    ?assert_status(400, Response),
+    ?assert_json_value(<<"ok">>, <<"false">>, Response).
 
 
 test_signing_up_with_existing_user_name() ->

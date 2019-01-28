@@ -10,20 +10,20 @@ handle_request(<<"POST">>, [], Request) ->
 
     case scio_user:create(Params) of
         {ok, _User} ->
-            {ok, 303, #{<<"location">> => <<"/">>}, <<"CREATE">>, Request};
+            {ok, 201, #{<<"location">> => <<"/">>}, <<"CREATE">>, Request};
         {error, email_already_exists} ->
             Message = #{
               <<"ok">>    => <<"false">>,
               <<"error">> => <<"Email Address already exists">>
             },
-            {ok, 400, #{}, jiffy:encode(Message), Request};
+            {ok, 400, #{<<"content-type">> => <<"application/json">>}, jiffy:encode(Message), Request};
         {error, Reason} ->
             logger:error("Unexpected Error: ~p~n", [Reason]),
             Message = #{
               <<"ok">>    => <<"false">>,
               <<"error">> => <<"An unexpected error has occurred">>
             },
-            {ok, 400, #{}, jiffy:encode(Message), Request}
+            {ok, 400, #{<<"content-type">> => <<"application/json">>}, jiffy:encode(Message), Request}
     end;
 
 

@@ -13,12 +13,26 @@ ready(function() {
 
 var Scio = function() {
     this.initialize = function() {
-        console.log("HAI");
+        this.bind_login_form();
+        this.bind_sign_up_form();
+    };
+
+    this.bind_login_form = function() {
         let login_button = document.querySelector("#login_form button");
         if (login_button) {
             login_button.addEventListener("click", function(event) {
                 event.preventDefault();
                 this.login();
+            }.bind(this));
+        }
+    };
+
+    this.bind_sign_up_form = function() {
+        let signup_button = document.querySelector("#signup_form button");
+        if (signup_button) {
+            signup_button.addEventListener("click", function(event) {
+                event.preventDefault();
+                this.signup();
             }.bind(this));
         }
     };
@@ -39,6 +53,28 @@ var Scio = function() {
                     console.log("Invalid Login Credentials");
                 }
             }(data))
+            .catch(error => console.error(error));
+    };
+
+    this.signup = function() {
+        let form_element = document.querySelector("#signup_form"),
+            form_data    = new FormData(form_element),
+            payload = {
+                "email"    : form_data.get("email"),
+                "username" : form_data.get("username"),
+                "password" : form_data.get("password")
+            };
+
+        this.post_form("/users", payload)
+            .then(data => function(data) {
+                if (data.status === 201) {
+                    window.location.assign(data.headers.get("location"));
+                } else {
+                    console.log(data.error);
+                    return data.json();
+                }
+            }(data))
+            .then(json => console.log(json.error))
             .catch(error => console.error(error));
     };
 

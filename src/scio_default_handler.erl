@@ -66,6 +66,17 @@ handle_request(_, _, Request) ->
 % # Internal API                                                               #
 % ##############################################################################
 
+
+render_html(Status, #{<<"content-type">> := <<"application/json">>} = Headers, Body, Request) ->
+
+    cowboy_req:reply(
+        Status,
+        Headers,
+        Body,
+        Request
+    );
+
+
 render_html(Status, Headers, Body, Request) ->
     Session = case cowboy_req:binding(session, Request) of
         undefined -> <<"Not logged in">>;
