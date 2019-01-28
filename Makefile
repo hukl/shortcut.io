@@ -5,7 +5,7 @@ default:
 	rebar3 compile
 
 test:
-	rebar3 compile && ETEST_ARGS="-config config/test.config" ETEST_BUILD_DIR="_build/default/lib/scio" _build/default/lib/etest/bin/etest-runner
+	rebar3 compile && ETEST_ARGS="-config config/test.config" WITH_COVERAGE=true ETEST_BUILD_DIR="_build/default/lib/scio" _build/default/lib/etest/bin/etest-runner
 
 test_debug:
 	rebar3 compile && ETEST_ARGS="-config config/test.config" _build/default/lib/etest/bin/etest-runner
