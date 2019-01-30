@@ -155,6 +155,27 @@ test_unsuccessful_log_in_with_wrong_email() ->
     ?assert_equal({ok, 0}, scio_session_store:count()).
 
 
+test_login_and_stay_logged_in() ->
+    create_user(),
+
+    Url     = ?BASE_URL ++ "/sessions",
+    Headers = [{"content-type", "application/json"}],
+    Params  = #{
+        <<"email">>    => <<"foo@bar.com">>,
+        <<"password">> => <<"dreimalraten">>
+    },
+
+    Json = jiffy:encode(Params),
+
+    Res  = ?perform_post(Url, Headers, Json, []),
+    ResHeaders = Res#etest_http_res.headers,
+    Cookie     = proplists:get_value("set-cookie", ResHeaders),
+
+    UrlNew = ?BASE_URL ++ "/",
+    ResNew = ?perform_get(UrlNew, [{"cookie", Cookie}]),
+    ?assert_body_contains("You're logged in", ResNew).
+
+
 test_not_found() ->
     Url = ?BASE_URL ++ "/users/bogus_path",
     Res = ?perform_get(Url),

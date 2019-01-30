@@ -38,6 +38,7 @@ stop(_State) ->
 initialize_cowboy() ->
     Dispatch = cowboy_router:compile([
         {'_', [
+            {"/favicon.ico", cowboy_static, {priv_file, scio, "static/favicon.ico"}},
             {"/static/[...]", cowboy_static, {priv_dir, scio, "static"}},
             {'_', scio_default_handler, []}
         ]}
