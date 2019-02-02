@@ -13,8 +13,20 @@
     </head>
 
     <body>
+        <div id="header">
+            <div id="shortcut_actions">
+                <input type="text" name="search" />
+            </div>
+            <div id="user_actions">
+                {{session}}
+                <ul>
+                    <li><a href="/users/new">Signup</a></li>
+                    <li><a href="/sessions/new">Login</a></li>
+                    <li><a href="/sessions/logout">Logout</a></li>
+                </ul>
+            </div>
+        </div>
         <div class="container">
-            <p>{{session}}</p>
             {{{body}}}
         </div>
         <script src="/static/js/scio.js"></script>
