@@ -20,7 +20,7 @@ dialyzer:
 	rebar3 dialyzer
 
 schema_dump:
-	pg_dump -h localhost -U shortcut -c shortcut_dev > priv/db/schema.sql
+	pg_dump -h localhost -U shortcut -c -s shortcut_dev > priv/db/schema.sql
 
 schema_load: schema_load_dev schema_load_test
 
