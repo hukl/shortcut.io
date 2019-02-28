@@ -1,9 +1,9 @@
 -module(scio_users_handler).
 
--export([handle_request/3]).
+-export([handle_request/4]).
 
 
-handle_request(<<"POST">>, [], Request) ->
+handle_request(<<"POST">>, [], Request, _) ->
     {ok, Json, _RequestWithBody} = cowboy_req:read_body(Request),
 
     Params = jiffy:decode(Json, [return_maps]),
@@ -27,10 +27,10 @@ handle_request(<<"POST">>, [], Request) ->
     end;
 
 
-handle_request(<<"GET">>, [<<"new">>], Request) ->
+handle_request(<<"GET">>, [<<"new">>], Request, _) ->
     Body = user_new_view:render(#{}),
     {ok, 200, #{}, Body, Request};
 
 
-handle_request(_, _, Request) ->
+handle_request(_, _, Request, _) ->
     {ok, 404, #{}, <<"NOT FOUND">>, Request}.

@@ -2,6 +2,8 @@
 
 -export([init/2]).
 
+-include("scio.hrl").
+
 -define(PATH_SEPARATOR, binary:compile_pattern(<<"/">>)).
 -define(PATH_OPTIONS,   [trim_all, global]).
 
@@ -9,8 +11,10 @@ init(#{ method := Method, path := Path} = Request, State) ->
     PathSegments = binary:split(Path, ?PATH_SEPARATOR, ?PATH_OPTIONS),
     logger:error("Method: ~p Path: ~p~n", [Method, PathSegments]),
 
+    Session = nested:get([bindings, session], Request, undefined),
+
     {ok, Status, Headers, Body, NewRequest} = handle_request(
-        Method, PathSegments, Request
+        Method, PathSegments, Request, Session
     ),
 
     Response = render_html(Status, Headers, Body, NewRequest),
@@ -25,9 +29,10 @@ init(#{ method := Method, path := Path} = Request, State) ->
 -spec handle_request(
     bitstring(),
     list(),
-    cowboy:req()) -> {'ok', integer(), map(), bitstring(), cowboy:req()}.
+    cowboy:req(),
+    #session{} | 'undefined') -> {'ok', integer(), map(), bitstring(), cowboy:req()}.
 
-handle_request(<<"GET">>, [] , Request) ->
+handle_request(<<"GET">>, [] , Request, _) ->
     Body = landing_page_view:render(
         #{
              <<"greeting">> => <<"hello world">>,
@@ -41,20 +46,20 @@ handle_request(<<"GET">>, [] , Request) ->
     {ok, 200, #{}, Body, Request};
 
 
-handle_request(Method, [<<"users">>|Path], Request) ->
-    scio_users_handler:handle_request(Method, Path, Request);
+handle_request(Method, [<<"users">>|Path], Request, Session) ->
+    scio_users_handler:handle_request(Method, Path, Request, Session);
 
-handle_request(Method, [<<"sessions">>|Path], Request) ->
-    scio_session_handler:handle_request(Method, Path, Request);
+handle_request(Method, [<<"sessions">>|Path], Request, Session) ->
+    scio_session_handler:handle_request(Method, Path, Request, Session);
 
-handle_request(Method, [<<"shortcuts">>|Path], Request) ->
-    scio_shortcut_handler:handle_request(Method, Path, Request);
+handle_request(Method, [<<"shortcuts">>|Path], Request, Session) ->
+    scio_shortcut_handler:handle_request(Method, Path, Request, Session);
 
 
-handle_request(<<"GET">>, [<<"health">>], Request) ->
+handle_request(<<"GET">>, [<<"health">>], Request, _) ->
     {ok, 200, #{}, <<"OK">>, Request};
 
-handle_request(_, _, Request) ->
+handle_request(_, _, Request, _) ->
     Body = <<"NOT FOUND">>,
 
     cowboy_req:reply(
