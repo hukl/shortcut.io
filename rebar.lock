@@ -8,6 +8,7 @@
  {<<"etest_http">>,{pkg,<<"etest_http">>,<<"1.0.1">>},0},
  {<<"jiffy">>,{pkg,<<"jiffy">>,<<"0.15.2">>},1},
  {<<"meck">>,{pkg,<<"meck">>,<<"0.8.13">>},0},
+ {<<"nested">>,{pkg,<<"nested">>,<<"0.1.2">>},0},
  {<<"poolboy">>,{pkg,<<"poolboy">>,<<"1.5.1">>},0},
  {<<"ranch">>,{pkg,<<"ranch">>,<<"1.7.1">>},1}]}.
 [
@@ -21,6 +22,7 @@
  {<<"etest_http">>, <<"ACD3F66C03228CE17C7D3692ABC8106ACD8C10D02EE103D4DDF78E3314BF19AF">>},
  {<<"jiffy">>, <<"DE266C390111FD4EA28B9302F0BC3D7472468F3B8E0ACEABFBEFA26D08CD73B7">>},
  {<<"meck">>, <<"FFEDB39F99B0B99703B8601C6F17C7F76313EE12DE6B646E671E3188401F7866">>},
+ {<<"nested">>, <<"D411ABF7FDB6D6BCAC4A0E0769705649870E1046A98899001C282351E57C038D">>},
  {<<"poolboy">>, <<"6B46163901CFD0A1B43D692657ED9D7E599853B3B21B95AE5AE0A777CF9B6CA8">>},
  {<<"ranch">>, <<"6B1FAB51B49196860B733A49C07604465A47BDB78AA10C1C16A3D199F7F8C881">>}]}
 ].

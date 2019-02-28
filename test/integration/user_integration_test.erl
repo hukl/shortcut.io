@@ -21,20 +21,6 @@ after_suite() ->
     application:stop(scio).
 
 
-% Helper for creating new users
-create_user() ->
-    Url     = ?BASE_URL ++ "/users/",
-    Headers = [{"content-type", "application/json"}],
-    Params  = #{
-        <<"username">> => <<"Peter">>,
-        <<"email">>    => <<"foo@bar.com">>,
-        <<"password">> => <<"dreimalraten">>
-    },
-    Json = jiffy:encode(Params),
-
-    ?perform_post(Url, Headers, Json, []).
-
-
 test_signup_page() ->
     Url = ?BASE_URL ++ "/users/new",
     Res = ?perform_get(Url),
@@ -63,10 +49,10 @@ test_submitting_valid_form_should_create_user() ->
 
 test_signing_up_with_existing_email_address() ->
     % create the default user
-    create_user(),
+    test_helper:create_user(),
 
     % then sign up again which should create an error
-    Response = create_user(),
+    Response = test_helper:create_user(),
 
     ?assert_status(400, Response),
     ?assert_json_value(<<"ok">>, <<"false">>, Response).
@@ -74,7 +60,7 @@ test_signing_up_with_existing_email_address() ->
 
 test_signing_up_with_existing_user_name() ->
     % create the default user
-    create_user(),
+    test_helper:create_user(),
 
     Url     = ?BASE_URL ++ "/users/",
     Headers = [{"content-type", "application/json"}],
@@ -98,7 +84,7 @@ test_log_in_page() ->
 
 
 test_successful_log_in() ->
-    create_user(),
+    test_helper:create_user(),
 
     Url     = ?BASE_URL ++ "/sessions",
     Headers = [{"content-type", "application/json"}],
@@ -120,7 +106,7 @@ test_successful_log_in() ->
 
 
 test_unsuccessful_log_in_with_wrong_password() ->
-    create_user(),
+    test_helper:create_user(),
 
     Url     = ?BASE_URL ++ "/sessions",
     Headers = [{"content-type", "application/json"}],
@@ -138,7 +124,7 @@ test_unsuccessful_log_in_with_wrong_password() ->
 
 
 test_unsuccessful_log_in_with_wrong_email() ->
-    create_user(),
+    test_helper:create_user(),
 
     Url     = ?BASE_URL ++ "/sessions",
     Headers = [{"content-type", "application/json"}],
@@ -156,7 +142,7 @@ test_unsuccessful_log_in_with_wrong_email() ->
 
 
 test_login_and_stay_logged_in() ->
-    create_user(),
+    test_helper:create_user(),
 
     Url     = ?BASE_URL ++ "/sessions",
     Headers = [{"content-type", "application/json"}],

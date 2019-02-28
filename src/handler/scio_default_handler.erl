@@ -47,6 +47,9 @@ handle_request(Method, [<<"users">>|Path], Request) ->
 handle_request(Method, [<<"sessions">>|Path], Request) ->
     scio_session_handler:handle_request(Method, Path, Request);
 
+handle_request(Method, [<<"shortcuts">>|Path], Request) ->
+    scio_shortcut_handler:handle_request(Method, Path, Request);
+
 
 handle_request(<<"GET">>, [<<"health">>], Request) ->
     {ok, 200, #{}, <<"OK">>, Request};
