@@ -27,7 +27,7 @@ with_transaction(PoolName, Fun, Opts) ->
 flush_db() ->
     {ok, TableNames} = table_names(),
 
-    Query = <<"TRUNCATE ", TableNames/binary>>,
+    Query = <<"TRUNCATE ", TableNames/binary, " RESTART IDENTITY">>,
 
     case scio_sql:squery(pg, Query) of
         {ok, _Colums, []} ->
