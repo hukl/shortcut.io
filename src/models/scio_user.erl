@@ -13,7 +13,7 @@
 
 % CRUD
 
--spec create(#{ bitstring() => bitstring() }) -> {'ok', #user{}} | {'error', tuple()}.
+-spec create(#{ bitstring() => bitstring() }) -> {'ok', #user{}} | {'error', atom()} | {'error', epgsql:query_error()}.
 create(#{
     <<"username">> := Username,
     <<"email">>    := Email,

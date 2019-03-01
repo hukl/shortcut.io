@@ -35,8 +35,8 @@ create(#{
             },
 
             {ok, Shortcut};
-        {error, Error}
-            -> {error, Error}
+        {error, Error} -> 
+            {error, Error}
     end.
 
 -spec count() -> {'ok', integer()} | {'error', tuple()}.

@@ -23,7 +23,7 @@
     title           ::bitstring(),
     description     ::bitstring(),
     screenshot_id   ::bitstring(),
-    user_id         ::bitstring(),
+    user_id         ::integer(),
     created_at      ::bitstring(),
     updated_at      ::bitstring()
 }).
