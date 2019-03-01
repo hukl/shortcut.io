@@ -21,6 +21,7 @@ DROP INDEX public.users_email_idx;
 DROP INDEX public.tags_shortcut_id_idx;
 DROP INDEX public.tags_name_idx;
 DROP INDEX public.shortcuts_user_id_idx;
+DROP INDEX public.shortcuts_url_user_id_idx;
 ALTER TABLE ONLY public.users DROP CONSTRAINT users_pkey;
 ALTER TABLE ONLY public.tags DROP CONSTRAINT tags_pkey;
 ALTER TABLE ONLY public.shortcuts DROP CONSTRAINT shortcuts_pkey;
@@ -207,6 +208,13 @@ ALTER TABLE ONLY public.tags
 
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: shortcuts_url_user_id_idx; Type: INDEX; Schema: public; Owner: shortcut
+--
+
+CREATE UNIQUE INDEX shortcuts_url_user_id_idx ON public.shortcuts USING btree (url, user_id);
 
 
 --
