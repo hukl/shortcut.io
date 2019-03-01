@@ -20,17 +20,6 @@ before_test() ->
 after_suite() ->
     application:stop(scio).
 
-
-create_shortcut_fixtures(UserId) ->
-    Url = "http://foo.com/" ++ erlang:integer_to_list(rand:uniform(1000000)),
-    #{
-        <<"url">>         => Url,
-        <<"title">>       => <<"foo">>,
-        <<"description">> => <<"bar">>,
-        <<"user_id">>     => UserId
-    }.
-
-
 test_creating_a_bookmark() ->
     #etest_http_res{ headers = LoginHeaders} = test_helper:log_in_user(),
 
@@ -87,7 +76,6 @@ test_creating_a_bookmark_with_empty_params_should_fail() ->
         {"content-type", "application/json"},
         {"cookie",       Cookie}
     ],
-
     Params  = #{
         <<"url">>         => <<"">>,
         <<"title">>       => <<"">>,
@@ -112,14 +100,22 @@ test_creating_a_bookmark_with_empty_params_should_fail() ->
 test_displaying_bookmarks() ->
     #etest_http_res{ headers = LoginHeaders} = test_helper:log_in_user(),
 
-    [create_shortcut_fixtures(1) || _ <- lists:seq(1,5)],
+    [test_helper:create_shortcut_fixtures(1) || _ <- lists:seq(1,5)],
+
+    Cookie  = proplists:get_value("set-cookie", LoginHeaders),
+    Url     = ?BASE_URL ++ "/shortcuts",
+    Headers = [
+        {"content-type", "application/json"},
+        {"cookie",       Cookie}
+    ],
 
     Res = ?perform_get(Url, Headers),
     ?assert_status(200, Res),
+
     ResJson = jiffy:decode(Res#etest_http_res.body, [return_maps]),
     ?assert_equal(5, length(ResJson)),
-    RespKeys = maps:keys(hd(ResJson)),
-    ExpectedKeys = [
+    RespKeys = lists:sort(maps:keys(hd(ResJson))),
+    ExpectedKeys = lists:sort([
         <<"id">>,
         <<"url">>,
         <<"title">>,
@@ -127,6 +123,6 @@ test_displaying_bookmarks() ->
         <<"screenshot_id">>,
         <<"created_at">>,
         <<"updated_at">>
-    ],
+    ]),
     ?assert_equal(ExpectedKeys, RespKeys).
 

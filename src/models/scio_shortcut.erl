@@ -2,7 +2,8 @@
 
 -export([
     count/0,
-    create/1
+    create/1,
+    find_all_by_user_id/1
 ]).
 
 -include("scio.hrl").
@@ -38,6 +39,32 @@ create(#{
         {error, Error} -> 
             {error, Error}
     end.
+
+-spec find_all_by_user_id(integer()) -> {'ok', []} | {'ok', [#shortcut{}]}.
+find_all_by_user_id(UserId) ->
+    Query = "SELECT * "
+            "FROM shortcuts "
+            "WHERE user_id = $1 "
+            "ORDER BY created_at DESC "
+            "LIMIT 25;",
+
+    {ok, _Colums, Rows} = scio_sql:equery(pg, Query, [UserId]),
+
+    MapFun = fun({Id, Url, Title, Description, UserId, ScreenshotId, CreatedAt, UpdatedAt}) ->
+        #shortcut{
+            id              = Id,
+            url             = Url,
+            title           = Title,
+            description     = Description,
+            user_id         = UserId,
+            screenshot_id   = ScreenshotId,
+            created_at      = CreatedAt,
+            updated_at      = UpdatedAt
+        }
+    end,
+
+    {ok, lists:map(MapFun, Rows)}.
+
 
 -spec count() -> {'ok', integer()} | {'error', tuple()}.
 count() ->

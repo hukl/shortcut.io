@@ -38,3 +38,15 @@ log_in_user() ->
 
     ?perform_post(Url, Headers, Json, []).
 
+
+create_shortcut_fixtures(UserId) ->
+    Url = "http://foo.com/" ++ erlang:integer_to_list(rand:uniform(1000000)),
+    
+    Params = #{
+        <<"url">>         => erlang:list_to_binary(Url),
+        <<"title">>       => <<"foo">>,
+        <<"description">> => <<"bar">>,
+        <<"user_id">>     => UserId
+    },
+
+    scio_shortcut:create(Params).

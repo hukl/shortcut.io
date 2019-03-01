@@ -32,3 +32,12 @@ test_creating_a_shortcut() ->
     ?assert_equal(<<"Vorlesungsverzeichnis">>,         Shortcut#shortcut.title),
     ?assert_equal(<<"Vorlesungsverzeichnis der HTW">>, Shortcut#shortcut.description),
     ?assert_equal(1,                                   Shortcut#shortcut.user_id).
+
+
+test_find_by_user_id_with_no_data_in_db() ->
+    ?assert_equal({ok, []}, scio_shortcut:find_all_by_user_id(1)).
+
+test_find_by_user_id_with_data_in_db() ->
+    test_helper:create_shortcut_fixtures(1),
+
+    {ok, [#shortcut{} = _Shortcut]} = scio_shortcut:find_all_by_user_id(1).
