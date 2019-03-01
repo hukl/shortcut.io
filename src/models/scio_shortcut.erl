@@ -42,7 +42,15 @@ create(#{
 
 -spec find_all_by_user_id(integer()) -> {'ok', []} | {'ok', [#shortcut{}]}.
 find_all_by_user_id(UserId) ->
-    Query = "SELECT * "
+    Query = "SELECT "
+                "id, "
+                "url, "
+                "title, "
+                "description, "
+                "user_id, "
+                "screenshot_id, "
+                "EXTRACT(EPOCH FROM created_at) * 1000000 as created_at, "
+                "EXTRACT(EPOCH FROM created_at) * 1000000 as updated_at  "
             "FROM shortcuts "
             "WHERE user_id = $1 "
             "ORDER BY created_at DESC "

@@ -32,8 +32,8 @@ handle_request(<<"GET">>, [], Request, Session) ->
             <<"title">>             => Shortcut#shortcut.title,
             <<"description">>       => Shortcut#shortcut.description,
             <<"screenshot_id">>     => Shortcut#shortcut.screenshot_id,
-            <<"created_at">>        => 1,
-            <<"updated_at">>        => 2
+            <<"created_at">>        => Shortcut#shortcut.created_at,
+            <<"updated_at">>        => Shortcut#shortcut.updated_at
         }
     end,
 
