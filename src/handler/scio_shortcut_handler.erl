@@ -21,9 +21,8 @@ handle_request(<<"POST">>, [], Request, Session) ->
             {ok, 400, #{}, <<"Bad Request">>, Request}
     end;
 
-handle_request(<<"GET">>, [], Request, Session) ->
-    % => {ok, [#shortcut{}, #shortcut{}]}
-    {ok, Shortcuts} = scio_shortcut:find_all_by_user_id(Session#session.user_id),
+handle_request(<<"GET">>, [], Request, #session{ user_id = UserId }) ->
+    {ok, Shortcuts} = scio_shortcut:find_all_by_user_id(UserId),
 
     MapFun = fun(Shortcut) ->
         #{

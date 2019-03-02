@@ -2,7 +2,7 @@
 % Model Records
 
 -record(user, {
-    id          ::bitstring(),
+    id          ::integer(),
     uuid        ::bitstring(),
     username    ::bitstring(),
     email       ::bitstring(),
@@ -12,13 +12,13 @@
 
 -record(session, {
     session_id   :: bitstring(),
-    user_id    = undefined  :: bitstring() | 'undefined',
+    user_id    = undefined  :: integer()   | 'undefined',
     created_at = undefined  :: integer()   | 'undefined'
 }).
 
 
 -record(shortcut, {
-    id              ::bitstring(),
+    id              ::integer(),
     url             ::bitstring(),
     title           ::bitstring(),
     description     ::bitstring(),

@@ -13,7 +13,7 @@ before_suite() ->
 
 test_new_session() ->
     User = #user{
-        id       = <<"1">>,
+        id       = 1,
         uuid     = <<"some-uuid">>,
         username = <<"Bente">>,
         password = <<"foo">>,
@@ -22,7 +22,7 @@ test_new_session() ->
 
     {ok, Session} = scio_session:new(User),
 
-    ?assert_equal(<<"1">>, Session#session.user_id).
+    ?assert_equal(1, Session#session.user_id).
 
 
 test_generating_a_session_id() ->

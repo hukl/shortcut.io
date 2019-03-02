@@ -159,6 +159,7 @@ test_login_and_stay_logged_in() ->
 
     UrlNew = ?BASE_URL ++ "/",
     ResNew = ?perform_get(UrlNew, [{"cookie", Cookie}]),
+
     ?assert_body_contains("You're logged in", ResNew).
 
 

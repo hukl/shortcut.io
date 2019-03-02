@@ -8,7 +8,7 @@
 
 -include("scio.hrl").
 
--spec create(#{ bitstring() => bitstring() }) -> {'ok', #shortcut{}} | {'error', tuple()}.
+-spec create(#{ bitstring() => bitstring() | integer() }) -> {'ok', #shortcut{}} | {'error', term()}.
 create(#{
     <<"url">>         := Url,
     <<"title">>       := Title,
@@ -36,7 +36,7 @@ create(#{
             },
 
             {ok, Shortcut};
-        {error, Error} -> 
+        {error, Error} ->
             {error, Error}
     end.
 
@@ -58,13 +58,13 @@ find_all_by_user_id(UserId) ->
 
     {ok, _Colums, Rows} = scio_sql:equery(pg, Query, [UserId]),
 
-    MapFun = fun({Id, Url, Title, Description, UserId, ScreenshotId, CreatedAt, UpdatedAt}) ->
+    MapFun = fun({Id, Url, Title, Description, UId, ScreenshotId, CreatedAt, UpdatedAt}) ->
         #shortcut{
             id              = Id,
             url             = Url,
             title           = Title,
             description     = Description,
-            user_id         = UserId,
+            user_id         = UId,
             screenshot_id   = ScreenshotId,
             created_at      = CreatedAt,
             updated_at      = UpdatedAt

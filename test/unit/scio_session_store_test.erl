@@ -17,7 +17,7 @@ after_suite() ->
 
 test_storing_a_session() ->
     User = #user{
-        id       = <<"1">>,
+        id       = 1,
         uuid     = <<"some-uuid">>,
         username = <<"Bente">>,
         password = <<"foo">>,
@@ -39,7 +39,7 @@ test_validating_a_session_which_is_expired() ->
     Expired = Now + (365 * 24 * 60 * 60), % 365 days later
 
     User = #user{
-        id       = <<"1">>,
+        id       = 1,
         uuid     = <<"some-uuid">>,
         username = <<"Bente">>,
         password = <<"foo">>,
@@ -61,7 +61,7 @@ test_validating_a_session_which_is_expired() ->
 
 testing_a_valid_session_which_cant_be_found() ->
     User = #user{
-        id       = <<"1">>,
+        id       = 1,
         uuid     = <<"some-uuid">>,
         username = <<"Bente">>,
         password = <<"foo">>,
@@ -76,7 +76,7 @@ testing_a_valid_session_which_cant_be_found() ->
 
 testing_validating_a_valid_session() ->
     User = #user{
-        id       = <<"1">>,
+        id       = 1,
         uuid     = <<"some-uuid">>,
         username = <<"Bente">>,
         password = <<"foo">>,
