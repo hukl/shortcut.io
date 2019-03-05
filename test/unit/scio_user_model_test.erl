@@ -18,7 +18,6 @@ after_suite() ->
     application:stop(scio).
 
 
-
 test_creating_a_user() ->
     Password = <<"SicherSicher23">>,
 

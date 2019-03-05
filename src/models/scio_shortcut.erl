@@ -3,7 +3,8 @@
 -export([
     count/0,
     create/1,
-    find_all_by_user_id/1
+    find_all_by_user_id/1,
+    find/2
 ]).
 
 -include("scio.hrl").
@@ -72,6 +73,36 @@ find_all_by_user_id(UserId) ->
     end,
 
     {ok, lists:map(MapFun, Rows)}.
+
+
+find(ShortcutId, UserId) ->
+    Query = "SELECT "
+                "id, "
+                "url, "
+                "title, "
+                "description, "
+                "user_id, "
+                "screenshot_id, "
+                "EXTRACT(EPOCH FROM created_at) * 1000000 as created_at, "
+                "EXTRACT(EPOCH FROM created_at) * 1000000 as updated_at  "
+            "FROM shortcuts "
+            "WHERE user_id = $1 "
+            "AND id = $2;",
+
+    {ok, _Colums, [{Id, Url, Title, Description, UId, ScreenshotId, CreatedAt, UpdatedAt}]} = scio_sql:equery(pg, Query, [UserId, ShortcutId]),
+
+    Shortcut = #shortcut{
+        id              = Id,
+        url             = Url,
+        title           = Title,
+        description     = Description,
+        user_id         = UId,
+        screenshot_id   = ScreenshotId,
+        created_at      = CreatedAt,
+        updated_at      = UpdatedAt
+    },
+
+    {ok, Shortcut}.
 
 
 -spec count() -> {'ok', integer()} | {'error', tuple()}.

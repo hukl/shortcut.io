@@ -40,4 +40,25 @@ handle_request(<<"GET">>, [], Request, #session{ user_id = UserId }) ->
 
     JsonResponse = jiffy:encode(ShortcutList),
 
+    {ok, 200, #{<<"content-type">> => <<"application/json">>}, JsonResponse, Request};
+
+
+handle_request(<<"GET">>, [ShortcutId], Request, #session{ user_id = UserId }) ->
+    {ok, Shortcut} = scio_shortcut:find(
+        UserId, erlang:binary_to_integer(ShortcutId)
+    ),
+
+
+    Response = #{
+        <<"id">>                => Shortcut#shortcut.id,
+        <<"url">>               => Shortcut#shortcut.url,
+        <<"title">>             => Shortcut#shortcut.title,
+        <<"description">>       => Shortcut#shortcut.description,
+        <<"screenshot_id">>     => Shortcut#shortcut.screenshot_id,
+        <<"created_at">>        => Shortcut#shortcut.created_at,
+        <<"updated_at">>        => Shortcut#shortcut.updated_at
+    },
+
+    JsonResponse = jiffy:encode(Response),
+
     {ok, 200, #{<<"content-type">> => <<"application/json">>}, JsonResponse, Request}.

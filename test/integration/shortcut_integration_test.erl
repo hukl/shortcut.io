@@ -126,3 +126,34 @@ test_displaying_bookmarks() ->
     ]),
     ?assert_equal(ExpectedKeys, RespKeys).
 
+
+test_displaying_single_bookmark() ->
+    #etest_http_res{ headers = LoginHeaders} = test_helper:log_in_user(),
+
+    test_helper:create_shortcut_fixtures(1),
+
+    Cookie  = proplists:get_value("set-cookie", LoginHeaders),
+    Url     = ?BASE_URL ++ "/shortcuts/1",
+    Headers = [
+        {"content-type", "application/json"},
+        {"cookie",       Cookie}
+    ],
+
+    Res = ?perform_get(Url, Headers),
+    ?assert_status(200, Res),
+
+    ResJson = jiffy:decode(Res#etest_http_res.body, [return_maps]),
+    ?assert_equal(7, maps:size(ResJson)),
+    RespKeys = maps:keys(ResJson),
+    ExpectedKeys = [
+        <<"id">>,
+        <<"url">>,
+        <<"title">>,
+        <<"description">>,
+        <<"screenshot_id">>,
+        <<"created_at">>,
+        <<"updated_at">>
+    ],
+    ?assert_equal(lists:sort(ExpectedKeys), lists:sort(RespKeys)).
+
+
