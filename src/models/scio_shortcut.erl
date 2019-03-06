@@ -5,10 +5,29 @@
     create/1,
     find_all_by_user_id/1,
     find/2,
-    update/3
+    update/3,
+    to_map/1
 ]).
 
 -include("scio.hrl").
+
+-define(
+    SHORTCUT_COLUMNS,
+    "id, "
+    "url, "
+    "title, "
+    "description, "
+    "user_id, "
+    "screenshot_id, "
+    "EXTRACT(EPOCH FROM created_at) * 1000000 as created_at, "
+    "EXTRACT(EPOCH FROM created_at) * 1000000 as updated_at "
+).
+
+
+%% ===================================================================
+%% Public API
+%% ===================================================================
+
 
 -spec create(#{ bitstring() => bitstring() | integer() }) -> {'ok', #shortcut{}} | {'error', term()}.
 create(#{
@@ -21,38 +40,19 @@ create(#{
              "    (url, title, description, user_id) "
              "VALUES  "
              "    ($1, $2, $3, $4) "
-             "RETURNING id, url, title, description, user_id, screenshot_id, created_at, updated_at;",
+             "RETURNING " ++ ?SHORTCUT_COLUMNS,
 
     case scio_sql:equery(pg, Query, [Url, Title, Description, UserId]) of
-        {ok, _Count, _Colums, [{Id, Url, Title, Description, UserId, ScreenshotId, CreatedAt, UpdatedAt}]}->
-
-            Shortcut = #shortcut{
-                id              = Id,
-                url             = Url,
-                title           = Title,
-                description     = Description,
-                user_id         = UserId,
-                screenshot_id   = ScreenshotId,
-                created_at      = CreatedAt,
-                updated_at      = UpdatedAt
-            },
-
-            {ok, Shortcut};
+        {ok, _Count, _Colums, [Row]}->
+            {ok, row_to_record(Row)};
         {error, Error} ->
             {error, Error}
     end.
 
+
 -spec find_all_by_user_id(integer()) -> {'ok', []} | {'ok', [#shortcut{}]}.
 find_all_by_user_id(UserId) ->
-    Query = "SELECT "
-                "id, "
-                "url, "
-                "title, "
-                "description, "
-                "user_id, "
-                "screenshot_id, "
-                "EXTRACT(EPOCH FROM created_at) * 1000000 as created_at, "
-                "EXTRACT(EPOCH FROM created_at) * 1000000 as updated_at  "
+    Query = "SELECT " ++ ?SHORTCUT_COLUMNS
             "FROM shortcuts "
             "WHERE user_id = $1 "
             "ORDER BY created_at DESC "
@@ -60,50 +60,22 @@ find_all_by_user_id(UserId) ->
 
     {ok, _Colums, Rows} = scio_sql:equery(pg, Query, [UserId]),
 
-    MapFun = fun({Id, Url, Title, Description, UId, ScreenshotId, CreatedAt, UpdatedAt}) ->
-        #shortcut{
-            id              = Id,
-            url             = Url,
-            title           = Title,
-            description     = Description,
-            user_id         = UId,
-            screenshot_id   = ScreenshotId,
-            created_at      = CreatedAt,
-            updated_at      = UpdatedAt
-        }
+    MapFun = fun(Row) ->
+        row_to_record(Row)
     end,
 
     {ok, lists:map(MapFun, Rows)}.
 
 
 find(ShortcutId, UserId) ->
-    Query = "SELECT "
-                "id, "
-                "url, "
-                "title, "
-                "description, "
-                "user_id, "
-                "screenshot_id, "
-                "EXTRACT(EPOCH FROM created_at) * 1000000 as created_at, "
-                "EXTRACT(EPOCH FROM created_at) * 1000000 as updated_at  "
+    Query = "SELECT " ++ ?SHORTCUT_COLUMNS
             "FROM shortcuts "
             "WHERE user_id = $1 "
             "AND id = $2;",
 
-    {ok, _Colums, [{Id, Url, Title, Description, UId, ScreenshotId, CreatedAt, UpdatedAt}]} = scio_sql:equery(pg, Query, [UserId, ShortcutId]),
+    {ok, _Colums, [Row]} = scio_sql:equery(pg, Query, [UserId, ShortcutId]),
 
-    Shortcut = #shortcut{
-        id              = Id,
-        url             = Url,
-        title           = Title,
-        description     = Description,
-        user_id         = UId,
-        screenshot_id   = ScreenshotId,
-        created_at      = CreatedAt,
-        updated_at      = UpdatedAt
-    },
-
-    {ok, Shortcut}.
+    {ok, row_to_record(Row)}.
 
 
 -spec update(integer(), integer(), map()) -> {ok, integer()}.
@@ -112,21 +84,11 @@ update(ShortcutId, UserId, #{<<"url">> := Url, <<"title">> := Title, <<"descript
             "SET (url, title, description) = ($1, $2, $3) "
             "WHERE id = $4 "
             "AND user_id = $5 "
-            "RETURNING id, url, title, description, user_id, screenshot_id, EXTRACT(EPOCH FROM created_at) * 1000000 as created_at, EXTRACT(EPOCH FROM created_at) * 1000000 as updated_at;",
+            "RETURNING " ++ ?SHORTCUT_COLUMNS,
 
     case scio_sql:equery(pg, Query, [Url, Title, Description, ShortcutId, UserId]) of
-        {ok, _Count, _Colums, [{Id, Url, Title, Description, UId, ScreenshotId, CreatedAt, UpdatedAt}]} ->
-            Shortcut = #shortcut{
-                id              = Id,
-                url             = Url,
-                title           = Title,
-                description     = Description,
-                user_id         = UId,
-                screenshot_id   = ScreenshotId,
-                created_at      = CreatedAt,
-                updated_at      = UpdatedAt
-            },
-            {ok, Shortcut};
+        {ok, _Count, _Colums, [Row]} ->
+            {ok, row_to_record(Row)};
         {ok, 0 , _Columns, _Rows} ->
             {error, no_record_found};
         {error, Error} ->
@@ -145,3 +107,33 @@ count() ->
         {error, Error} ->
             {error, Error}
     end.
+
+
+-spec to_map(#shortcut{}) -> map().
+to_map(Shortcut) ->
+    #{
+        <<"id">>                => Shortcut#shortcut.id,
+        <<"url">>               => Shortcut#shortcut.url,
+        <<"title">>             => Shortcut#shortcut.title,
+        <<"description">>       => Shortcut#shortcut.description,
+        <<"screenshot_id">>     => Shortcut#shortcut.screenshot_id,
+        <<"created_at">>        => Shortcut#shortcut.created_at,
+        <<"updated_at">>        => Shortcut#shortcut.updated_at
+    }.
+
+%% ===================================================================
+%% Private API
+%% ===================================================================
+
+
+row_to_record({Id, Url, Title, Description, UId, ScreenshotId, CreatedAt, UpdatedAt}) ->
+    #shortcut{
+        id              = Id,
+        url             = Url,
+        title           = Title,
+        description     = Description,
+        user_id         = UId,
+        screenshot_id   = ScreenshotId,
+        created_at      = CreatedAt,
+        updated_at      = UpdatedAt
+    }.
