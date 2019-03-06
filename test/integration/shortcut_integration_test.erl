@@ -157,3 +157,32 @@ test_displaying_single_bookmark() ->
     ?assert_equal(lists:sort(ExpectedKeys), lists:sort(RespKeys)).
 
 
+test_updating_a_shortcut() ->
+    #etest_http_res{ headers = LoginHeaders} = test_helper:log_in_user(),
+
+    test_helper:create_shortcut_fixtures(1),
+
+    Cookie  = proplists:get_value("set-cookie", LoginHeaders),
+    Url     = ?BASE_URL ++ "/shortcuts/1",
+    Headers = [
+        {"content-type", "application/json"},
+        {"cookie",       Cookie}
+    ],
+
+    Res1 = ?perform_get(Url, Headers),
+    ?assert_status(200, Res1),
+
+    Params  = #{
+        <<"url">>         => <<"http://bar.com">>,
+        <<"title">>       => <<"Neuer Titel">>,
+        <<"description">> => <<"Neue Beschreibung">>
+    },
+    ReqJson = jiffy:encode(Params),
+    Res2 = ?perform_put(Url, Headers, ReqJson, []),
+    ?assert_status(200, Res2),
+
+    Res3 = ?perform_get(Url, Headers),
+    ResJson = jiffy:decode(Res3#etest_http_res.body, [return_maps]),
+    ?assert_equal(<<"http://bar.com">>,    maps:get(<<"url">>, ResJson)),
+    ?assert_equal(<<"Neuer Titel">>,       maps:get(<<"title">>, ResJson)),
+    ?assert_equal(<<"Neue Beschreibung">>, maps:get(<<"description">>, ResJson)).

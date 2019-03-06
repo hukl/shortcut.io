@@ -39,10 +39,18 @@ test_find_by_user_id_with_no_data_in_db() ->
 
 test_find_by_user_id_with_data_in_db() ->
     test_helper:create_shortcut_fixtures(1),
-
     {ok, [#shortcut{} = _Shortcut]} = scio_shortcut:find_all_by_user_id(1).
 
-test_find_by_user() ->
+test_find() ->
     test_helper:create_shortcut_fixtures(1),
     ?assert_match({'ok', #shortcut{}}, scio_shortcut:find(1, 1)).
+
+test_update_shortcut() ->
+    test_helper:create_shortcut_fixtures(1),
+    Params  = #{
+        <<"url">>         => <<"http://bar.com">>,
+        <<"title">>       => <<"Neuer Titel">>,
+        <<"description">> => <<"Neue Beschreibung">>
+    },
+    scio_shortcut:update(1, Params).
 

@@ -4,7 +4,8 @@
     count/0,
     create/1,
     find_all_by_user_id/1,
-    find/2
+    find/2,
+    update/2
 ]).
 
 -include("scio.hrl").
@@ -103,6 +104,15 @@ find(ShortcutId, UserId) ->
     },
 
     {ok, Shortcut}.
+
+
+-spec update(integer(), map()) -> {ok, integer()}.
+update(ShortcutId, #{<<"url">> := Url, <<"title">> := Title, <<"description">> := Description}) ->
+    Query = "UPDATE shortcuts "
+            "SET (url, title, description) = ($1, $2, $3) "
+            "WHERE id = $4;",
+
+    {ok, _Count} = scio_sql:equery(pg, Query, [Url, Title, Description, ShortcutId]).
 
 
 -spec count() -> {'ok', integer()} | {'error', tuple()}.

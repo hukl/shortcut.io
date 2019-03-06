@@ -48,7 +48,6 @@ handle_request(<<"GET">>, [ShortcutId], Request, #session{ user_id = UserId }) -
         UserId, erlang:binary_to_integer(ShortcutId)
     ),
 
-
     Response = #{
         <<"id">>                => Shortcut#shortcut.id,
         <<"url">>               => Shortcut#shortcut.url,
@@ -61,4 +60,13 @@ handle_request(<<"GET">>, [ShortcutId], Request, #session{ user_id = UserId }) -
 
     JsonResponse = jiffy:encode(Response),
 
-    {ok, 200, #{<<"content-type">> => <<"application/json">>}, JsonResponse, Request}.
+    {ok, 200, #{<<"content-type">> => <<"application/json">>}, JsonResponse, Request};
+
+
+handle_request(<<"PUT">>, [ShortcutId], Request, #session{ user_id = _UserId }) ->
+    {ok, Json, _RequestWithBody} = cowboy_req:read_body(Request),
+
+    Params = jiffy:decode(Json, [return_maps]),
+
+    {ok, _} = scio_shortcut:update(erlang:binary_to_integer(ShortcutId), Params),
+    {ok, 200, #{<<"content-type">> => <<"application/json">>}, <<"">>, Request}.
