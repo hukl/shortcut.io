@@ -5,7 +5,7 @@
     create/1,
     find_all_by_user_id/1,
     find/2,
-    update/2
+    update/3
 ]).
 
 -include("scio.hrl").
@@ -106,13 +106,32 @@ find(ShortcutId, UserId) ->
     {ok, Shortcut}.
 
 
--spec update(integer(), map()) -> {ok, integer()}.
-update(ShortcutId, #{<<"url">> := Url, <<"title">> := Title, <<"description">> := Description}) ->
+-spec update(integer(), integer(), map()) -> {ok, integer()}.
+update(ShortcutId, UserId, #{<<"url">> := Url, <<"title">> := Title, <<"description">> := Description}) ->
     Query = "UPDATE shortcuts "
             "SET (url, title, description) = ($1, $2, $3) "
-            "WHERE id = $4;",
+            "WHERE id = $4 "
+            "AND user_id = $5 "
+            "RETURNING id, url, title, description, user_id, screenshot_id, EXTRACT(EPOCH FROM created_at) * 1000000 as created_at, EXTRACT(EPOCH FROM created_at) * 1000000 as updated_at;",
 
-    {ok, _Count} = scio_sql:equery(pg, Query, [Url, Title, Description, ShortcutId]).
+    case scio_sql:equery(pg, Query, [Url, Title, Description, ShortcutId, UserId]) of
+        {ok, _Count, _Colums, [{Id, Url, Title, Description, UId, ScreenshotId, CreatedAt, UpdatedAt}]} ->
+            Shortcut = #shortcut{
+                id              = Id,
+                url             = Url,
+                title           = Title,
+                description     = Description,
+                user_id         = UId,
+                screenshot_id   = ScreenshotId,
+                created_at      = CreatedAt,
+                updated_at      = UpdatedAt
+            },
+            {ok, Shortcut};
+        {ok, 0 , _Columns, _Rows} ->
+            {error, no_record_found};
+        {error, Error} ->
+            {error, Error}
+    end.
 
 
 -spec count() -> {'ok', integer()} | {'error', tuple()}.

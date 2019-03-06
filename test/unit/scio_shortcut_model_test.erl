@@ -52,5 +52,5 @@ test_update_shortcut() ->
         <<"title">>       => <<"Neuer Titel">>,
         <<"description">> => <<"Neue Beschreibung">>
     },
-    scio_shortcut:update(1, Params).
+    scio_shortcut:update(1, 1, Params).
 
