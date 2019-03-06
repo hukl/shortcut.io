@@ -18,20 +18,15 @@ SET row_security = off;
 DROP INDEX public.users_uuid_idx;
 DROP INDEX public.users_username_idx;
 DROP INDEX public.users_email_idx;
-DROP INDEX public.tags_shortcut_id_idx;
-DROP INDEX public.tags_name_idx;
 DROP INDEX public.shortcuts_user_id_idx;
 DROP INDEX public.shortcuts_url_user_id_idx;
+DROP INDEX public.shortcuts_tags_idx;
 ALTER TABLE ONLY public.users DROP CONSTRAINT users_pkey;
-ALTER TABLE ONLY public.tags DROP CONSTRAINT tags_pkey;
 ALTER TABLE ONLY public.shortcuts DROP CONSTRAINT shortcuts_pkey;
 ALTER TABLE public.users ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE public.tags ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE public.shortcuts ALTER COLUMN id DROP DEFAULT;
 DROP SEQUENCE public.users_id_seq;
 DROP TABLE public.users;
-DROP SEQUENCE public.tags_id_seq;
-DROP TABLE public.tags;
 DROP SEQUENCE public.shortcuts_id_seq;
 DROP TABLE public.shortcuts;
 DROP EXTENSION pgcrypto;
@@ -64,6 +59,7 @@ CREATE TABLE public.shortcuts (
     description text,
     screenshot_id character varying(255),
     user_id integer NOT NULL,
+    tags jsonb,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
@@ -91,41 +87,6 @@ ALTER TABLE public.shortcuts_id_seq OWNER TO shortcut;
 --
 
 ALTER SEQUENCE public.shortcuts_id_seq OWNED BY public.shortcuts.id;
-
-
---
--- Name: tags; Type: TABLE; Schema: public; Owner: shortcut
---
-
-CREATE TABLE public.tags (
-    id integer NOT NULL,
-    name character varying(100) NOT NULL,
-    shortcut_id integer NOT NULL
-);
-
-
-ALTER TABLE public.tags OWNER TO shortcut;
-
---
--- Name: tags_id_seq; Type: SEQUENCE; Schema: public; Owner: shortcut
---
-
-CREATE SEQUENCE public.tags_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.tags_id_seq OWNER TO shortcut;
-
---
--- Name: tags_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: shortcut
---
-
-ALTER SEQUENCE public.tags_id_seq OWNED BY public.tags.id;
 
 
 --
@@ -173,13 +134,6 @@ ALTER TABLE ONLY public.shortcuts ALTER COLUMN id SET DEFAULT nextval('public.sh
 
 
 --
--- Name: tags id; Type: DEFAULT; Schema: public; Owner: shortcut
---
-
-ALTER TABLE ONLY public.tags ALTER COLUMN id SET DEFAULT nextval('public.tags_id_seq'::regclass);
-
-
---
 -- Name: users id; Type: DEFAULT; Schema: public; Owner: shortcut
 --
 
@@ -195,19 +149,18 @@ ALTER TABLE ONLY public.shortcuts
 
 
 --
--- Name: tags tags_pkey; Type: CONSTRAINT; Schema: public; Owner: shortcut
---
-
-ALTER TABLE ONLY public.tags
-    ADD CONSTRAINT tags_pkey PRIMARY KEY (id);
-
-
---
 -- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: shortcut
 --
 
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: shortcuts_tags_idx; Type: INDEX; Schema: public; Owner: shortcut
+--
+
+CREATE INDEX shortcuts_tags_idx ON public.shortcuts USING gin (tags);
 
 
 --
@@ -222,20 +175,6 @@ CREATE UNIQUE INDEX shortcuts_url_user_id_idx ON public.shortcuts USING btree (u
 --
 
 CREATE INDEX shortcuts_user_id_idx ON public.shortcuts USING btree (user_id);
-
-
---
--- Name: tags_name_idx; Type: INDEX; Schema: public; Owner: shortcut
---
-
-CREATE INDEX tags_name_idx ON public.tags USING btree (name);
-
-
---
--- Name: tags_shortcut_id_idx; Type: INDEX; Schema: public; Owner: shortcut
---
-
-CREATE INDEX tags_shortcut_id_idx ON public.tags USING btree (shortcut_id);
 
 
 --
