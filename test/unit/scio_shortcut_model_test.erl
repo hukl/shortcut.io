@@ -46,11 +46,13 @@ test_find() ->
     ?assert_match({'ok', #shortcut{}}, scio_shortcut:find(1, 1)).
 
 test_update_shortcut() ->
-    test_helper:create_shortcut_fixtures(1),
+    Shortcut = test_helper:create_shortcut_fixtures(1),
     Params  = #{
         <<"url">>         => <<"http://bar.com">>,
         <<"title">>       => <<"Neuer Titel">>,
         <<"description">> => <<"Neue Beschreibung">>
     },
-    scio_shortcut:update(1, 1, Params).
+    UpdatedShortcut = scio_shortcut:update(1, 1, Params),
+
+    ?assert_not_equal(Shortcut, UpdatedShortcut).
 
