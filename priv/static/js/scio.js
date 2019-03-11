@@ -13,6 +13,36 @@ ready(function() {
 
 var Scio = function() {
     this.initialize = function() {
+        if (window.location.pathname === "/") {
+            fetch('/shortcuts')
+                .then(function(response) {
+                  return response.json();
+                })
+                .then(function(shortcuts) {
+
+                    shortcuts.forEach(function(shortcut) {
+                        let template = document.importNode(
+                            document.getElementById("shortcut_template"), true
+                        );
+
+                        let div = template.content.querySelector("div");
+
+                        let url = div.querySelector(".shortcut_url");
+                        url.textContent = shortcut.url;
+
+                        let title = div.querySelector(".shortcut_title");
+                        title.textContent = shortcut.title;
+
+                        let description = div.querySelector(".shortcut_description");
+                        description.textContent = shortcut.description;
+
+                        let container = document.querySelector("#wrapper");
+                        container.appendChild(div);
+                    });
+
+
+                });
+        }
         this.bind_login_form();
         this.bind_sign_up_form();
     };

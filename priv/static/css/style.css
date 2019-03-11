@@ -48,3 +48,15 @@ input[type=text] {
     padding: 5px;
 }
 
+
+#wrapper {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 200px);
+    grid-template-rows: auto;
+    grid-gap: 1.5rem;
+}
+
+.shortcut {
+    background-color: silver;
+    height: 200px;
+}
