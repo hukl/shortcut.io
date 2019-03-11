@@ -182,7 +182,8 @@ test_updating_a_shortcut() ->
     Params  = #{
         <<"url">>         => <<"http://bar.com">>,
         <<"title">>       => <<"Neuer Titel">>,
-        <<"description">> => <<"Neue Beschreibung">>
+        <<"description">> => <<"Neue Beschreibung">>,
+        <<"tags">>        => [<<"foo">>, <<"bar">>, <<"baz">>]
     },
     ReqJson = jiffy:encode(Params),
     Res2 = ?perform_put(Url, Headers, ReqJson, []),
@@ -192,7 +193,8 @@ test_updating_a_shortcut() ->
     ResJson = jiffy:decode(Res3#etest_http_res.body, [return_maps]),
     ?assert_equal(<<"http://bar.com">>,    maps:get(<<"url">>, ResJson)),
     ?assert_equal(<<"Neuer Titel">>,       maps:get(<<"title">>, ResJson)),
-    ?assert_equal(<<"Neue Beschreibung">>, maps:get(<<"description">>, ResJson)).
+    ?assert_equal(<<"Neue Beschreibung">>, maps:get(<<"description">>, ResJson)),
+    ?assert_equal([<<"foo">>, <<"bar">>, <<"baz">>], maps:get(<<"tags">>, ResJson)).
 
 
 test_updating_a_shortcut_of_a_different_user_should_fail() ->
@@ -210,7 +212,8 @@ test_updating_a_shortcut_of_a_different_user_should_fail() ->
     Params  = #{
         <<"url">>         => <<"http://bar.com">>,
         <<"title">>       => <<"Neuer Titel">>,
-        <<"description">> => <<"Neue Beschreibung">>
+        <<"description">> => <<"Neue Beschreibung">>,
+        <<"tags">>        => [<<"foo">>, <<"bar">>, <<"baz">>]
     },
     ReqJson = jiffy:encode(Params),
     Res2 = ?perform_put(Url, Headers, ReqJson, []),
@@ -219,4 +222,5 @@ test_updating_a_shortcut_of_a_different_user_should_fail() ->
     {ok, Shortcut} = scio_shortcut:find(1, 42),
     ?assert_equal(OldShortcut#shortcut.url, Shortcut#shortcut.url),
     ?assert_equal(OldShortcut#shortcut.title, Shortcut#shortcut.title),
-    ?assert_equal(OldShortcut#shortcut.description, Shortcut#shortcut.description).
+    ?assert_equal(OldShortcut#shortcut.description, Shortcut#shortcut.description),
+    ?assert_equal(OldShortcut#shortcut.tags, Shortcut#shortcut.tags).

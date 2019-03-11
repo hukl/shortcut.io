@@ -83,14 +83,16 @@ find(ShortcutId, UserId) ->
 
 
 -spec update(integer(), integer(), map()) -> {ok, integer()}.
-update(ShortcutId, UserId, #{<<"url">> := Url, <<"title">> := Title, <<"description">> := Description}) ->
+update(ShortcutId, UserId, #{<<"url">> := Url, <<"title">> := Title, <<"description">> := Description, <<"tags">> := Tags}) ->
     Query = "UPDATE shortcuts "
-            "SET (url, title, description) = ($1, $2, $3) "
-            "WHERE id = $4 "
-            "AND user_id = $5 "
+            "SET (url, title, description, tags) = ($1, $2, $3, $4) "
+            "WHERE id = $5 "
+            "AND user_id = $6 "
             "RETURNING " ++ ?SHORTCUT_COLUMNS,
 
-    case scio_sql:equery(pg, Query, [Url, Title, Description, ShortcutId, UserId]) of
+    JsonTags = jiffy:encode(Tags),
+
+    case scio_sql:equery(pg, Query, [Url, Title, Description, JsonTags, ShortcutId, UserId]) of
         {ok, _Count, _Colums, [Row]} ->
             {ok, row_to_record(Row)};
         {ok, 0 , _Columns, _Rows} ->

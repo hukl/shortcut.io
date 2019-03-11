@@ -52,9 +52,14 @@ test_update_shortcut() ->
     Params  = #{
         <<"url">>         => <<"http://bar.com">>,
         <<"title">>       => <<"Neuer Titel">>,
-        <<"description">> => <<"Neue Beschreibung">>
+        <<"description">> => <<"Neue Beschreibung">>,
+        <<"tags">>        => [<<"foo">>, <<"bar">>, <<"baz">>]
     },
-    UpdatedShortcut = scio_shortcut:update(1, 1, Params),
+    {ok, UpdatedShortcut} = scio_shortcut:update(1, 1, Params),
 
-    ?assert_not_equal(Shortcut, UpdatedShortcut).
-
+    ?assert_not_equal(Shortcut, UpdatedShortcut),
+    ?assert_equal(<<"http://bar.com">>,              UpdatedShortcut#shortcut.url),
+    ?assert_equal(<<"Neuer Titel">>,                 UpdatedShortcut#shortcut.title),
+    ?assert_equal(<<"Neue Beschreibung">>,           UpdatedShortcut#shortcut.description),
+    ?assert_equal(1,                                 UpdatedShortcut#shortcut.user_id),
+    ?assert_equal([<<"foo">>, <<"bar">>, <<"baz">>], UpdatedShortcut#shortcut.tags).
