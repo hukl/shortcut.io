@@ -50,9 +50,7 @@ create(#{
         {ok, _Count, _Colums, [Row]}->
             {ok, row_to_record(Row)};
         {error, Error} ->
-            {error, Error};
-        Whatever ->
-            io:format("WHAAAAATEVER ~p~n", [Whatever])
+            {error, Error}
     end.
 
 
