@@ -35,7 +35,8 @@ test_creating_a_shortcut() ->
     Params  = #{
         <<"url">>         => <<"https://lsf.htw-berlin.de">>,
         <<"title">>       => <<"Vorlesungsverzeichnis">>,
-        <<"description">> => <<"Vorlesungsverzeichnis der HTW">>
+        <<"description">> => <<"Vorlesungsverzeichnis der HTW">>,
+        <<"tags">>        => [<<"Uni">>, <<"htw">>]
     },
 
     Json = jiffy:encode(Params),
@@ -70,7 +71,7 @@ test_creating_a_shortcut_should_fail_for_logged_out_users() ->
     ?assert_status(403, Res).
 
 
-test_creating_a_shortcut_with_empty_params_should_fail() ->
+test_creating_a_shortcut_with_the_same_url_and_user_id_should_fail() ->
     #etest_http_res{ headers = LoginHeaders} = test_helper:log_in_user(),
 
     Cookie  = proplists:get_value("set-cookie", LoginHeaders),
@@ -80,9 +81,10 @@ test_creating_a_shortcut_with_empty_params_should_fail() ->
         {"cookie",       Cookie}
     ],
     Params  = #{
-        <<"url">>         => <<"">>,
-        <<"title">>       => <<"">>,
-        <<"description">> => <<"">>
+        <<"url">>         => <<"http://foo.bar.com">>,
+        <<"title">>       => <<"Hello?">>,
+        <<"description">> => <<"No Problemo">>,
+        <<"tags">>        => [<<"fnord">>, <<"foo">>]
     },
 
     Json = jiffy:encode(Params),
@@ -124,6 +126,7 @@ test_displaying_shortcuts() ->
         <<"title">>,
         <<"description">>,
         <<"screenshot_id">>,
+        <<"tags">>,
         <<"created_at">>,
         <<"updated_at">>
     ]),
@@ -146,7 +149,7 @@ test_displaying_single_shortcut() ->
     ?assert_status(200, Res),
 
     ResJson = jiffy:decode(Res#etest_http_res.body, [return_maps]),
-    ?assert_equal(7, maps:size(ResJson)),
+    ?assert_equal(8, maps:size(ResJson)),
     RespKeys = maps:keys(ResJson),
     ExpectedKeys = [
         <<"id">>,
@@ -154,6 +157,7 @@ test_displaying_single_shortcut() ->
         <<"title">>,
         <<"description">>,
         <<"screenshot_id">>,
+        <<"tags">>,
         <<"created_at">>,
         <<"updated_at">>
     ],

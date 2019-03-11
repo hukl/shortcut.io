@@ -23,7 +23,8 @@ test_creating_a_shortcut() ->
         <<"url">>           => <<"https://lsf.htw-berlin.de">>,
         <<"title">>         => <<"Vorlesungsverzeichnis">>,
         <<"description">>   => <<"Vorlesungsverzeichnis der HTW">>,
-        <<"user_id">>       => 1
+        <<"user_id">>       => 1,
+        <<"tags">>          => [<<"Uni">>, <<"htw">>]
     },
 
     {ok, Shortcut} = scio_shortcut:create(Params),
@@ -31,7 +32,8 @@ test_creating_a_shortcut() ->
     ?assert_equal(<<"https://lsf.htw-berlin.de">>,     Shortcut#shortcut.url),
     ?assert_equal(<<"Vorlesungsverzeichnis">>,         Shortcut#shortcut.title),
     ?assert_equal(<<"Vorlesungsverzeichnis der HTW">>, Shortcut#shortcut.description),
-    ?assert_equal(1,                                   Shortcut#shortcut.user_id).
+    ?assert_equal(1,                                   Shortcut#shortcut.user_id),
+    ?assert_equal([<<"Uni">>, <<"htw">>],              Shortcut#shortcut.tags).
 
 
 test_find_by_user_id_with_no_data_in_db() ->

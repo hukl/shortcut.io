@@ -19,6 +19,7 @@
     "description, "
     "user_id, "
     "screenshot_id, "
+    "tags, "
     "EXTRACT(EPOCH FROM created_at) * 1000000 as created_at, "
     "EXTRACT(EPOCH FROM created_at) * 1000000 as updated_at "
 ).
@@ -34,15 +35,18 @@ create(#{
     <<"url">>         := Url,
     <<"title">>       := Title,
     <<"description">> := Description,
-    <<"user_id">>     := UserId} = _Params) ->
+    <<"user_id">>     := UserId,
+    <<"tags">>        := Tags} = _Params) ->
 
     Query = "INSERT INTO shortcuts "
-             "    (url, title, description, user_id) "
+             "    (url, title, description, user_id, tags) "
              "VALUES  "
-             "    ($1, $2, $3, $4) "
+             "    ($1, $2, $3, $4, $5) "
              "RETURNING " ++ ?SHORTCUT_COLUMNS,
 
-    case scio_sql:equery(pg, Query, [Url, Title, Description, UserId]) of
+    JsonTags = jiffy:encode(Tags),
+
+    case scio_sql:equery(pg, Query, [Url, Title, Description, UserId, JsonTags]) of
         {ok, _Count, _Colums, [Row]}->
             {ok, row_to_record(Row)};
         {error, Error} ->
@@ -117,6 +121,7 @@ to_map(Shortcut) ->
         <<"title">>             => Shortcut#shortcut.title,
         <<"description">>       => Shortcut#shortcut.description,
         <<"screenshot_id">>     => Shortcut#shortcut.screenshot_id,
+        <<"tags">>              => Shortcut#shortcut.tags,
         <<"created_at">>        => Shortcut#shortcut.created_at,
         <<"updated_at">>        => Shortcut#shortcut.updated_at
     }.
@@ -126,7 +131,7 @@ to_map(Shortcut) ->
 %% ===================================================================
 
 
-row_to_record({Id, Url, Title, Description, UId, ScreenshotId, CreatedAt, UpdatedAt}) ->
+row_to_record({Id, Url, Title, Description, UId, ScreenshotId, Tags, CreatedAt, UpdatedAt}) ->
     #shortcut{
         id              = Id,
         url             = Url,
@@ -134,6 +139,7 @@ row_to_record({Id, Url, Title, Description, UId, ScreenshotId, CreatedAt, Update
         description     = Description,
         user_id         = UId,
         screenshot_id   = ScreenshotId,
+        tags            = jiffy:decode(Tags, [return_maps]),
         created_at      = CreatedAt,
         updated_at      = UpdatedAt
     }.

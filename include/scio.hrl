@@ -24,6 +24,7 @@
     description     ::bitstring(),
     screenshot_id   ::bitstring(),
     user_id         ::integer(),
+    tags            ::[bitstring()],
     created_at      ::bitstring(),
     updated_at      ::bitstring()
 }).
