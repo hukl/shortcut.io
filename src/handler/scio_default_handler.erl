@@ -33,15 +33,7 @@ init(#{ method := Method, path := Path} = Request, State) ->
     #session{} | 'undefined') -> {'ok', integer(), map(), bitstring(), cowboy:req()}.
 
 handle_request(<<"GET">>, [] , Request, _) ->
-    Body = landing_page_view:render(
-        #{
-             <<"greeting">> => <<"hello world">>,
-             <<"names">>    => [
-                #{<<"name">> => <<"alice">>},
-                #{<<"name">> => <<"bob">>}
-            ]
-        }
-    ),
+    Body = landing_page_view:render(#{}),
 
     {ok, 200, #{}, Body, Request};
 

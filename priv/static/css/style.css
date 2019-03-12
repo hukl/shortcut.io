@@ -50,13 +50,40 @@ input[type=text] {
 
 
 #wrapper {
+    padding-top: 20px;
     display: grid;
     grid-template-columns: repeat(auto-fill, 200px);
     grid-template-rows: auto;
-    grid-gap: 1.5rem;
+    grid-gap: 2rem;
 }
 
 .shortcut {
-    background-color: silver;
-    height: 200px;
+    position: relative;
+}
+
+
+.shortcut img {
+    width: 100%;
+    border: 1px solid #B0B0B0;
+    padding: 5px;
+    background-color: #FFFFFF;
+}
+
+.shortcut .meta {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: #F7F7F7;
+    padding: 5px;
+    border-top: 1px solid #B0B0B0;
+    border-right: 1px solid #B0B0B0;
+}
+
+.shortcut .details {
+    text-align: center;
+    font-size: 13px;
+}
+
+.shortcut .details .shortcut_title {
+    font-weight: bold;
 }

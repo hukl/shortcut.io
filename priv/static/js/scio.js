@@ -27,14 +27,15 @@ var Scio = function() {
 
                         let div = template.content.querySelector("div");
 
+                        let image = div.querySelector("img");
+
+                        image.setAttribute("src", "http://localhost:9000/" + shortcut.screenshot_id + ".jpeg");
+
                         let url = div.querySelector(".shortcut_url");
-                        url.textContent = shortcut.url;
+                        url.textContent = shortcut.url.substring(0, 32);
 
                         let title = div.querySelector(".shortcut_title");
-                        title.textContent = shortcut.title;
-
-                        let description = div.querySelector(".shortcut_description");
-                        description.textContent = shortcut.description;
+                        title.textContent = shortcut.title.substring(0, 32);
 
                         let container = document.querySelector("#wrapper");
                         container.appendChild(div);
