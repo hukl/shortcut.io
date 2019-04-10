@@ -6,7 +6,8 @@
     find_all_by_user_id/1,
     find/2,
     update/3,
-    to_map/1
+    to_map/1,
+    filter_by_tags/1
 ]).
 
 -include("scio.hrl").
@@ -113,6 +114,21 @@ count() ->
         {error, Error} ->
             {error, Error}
     end.
+
+
+filter_by_tags(TagList) ->
+    Query = "SELECT " ++ ?SHORTCUT_COLUMNS
+            "FROM shortcuts "
+            "WHERE tags @> $1;",
+
+    {ok, _Colums, Rows} = scio_sql:equery(pg, Query, [TagList]),
+
+    MapFun = fun(Row) ->
+        row_to_record(Row)
+    end,
+
+    {ok, lists:map(MapFun, Rows)}.
+
 
 
 -spec to_map(#shortcut{}) -> map().

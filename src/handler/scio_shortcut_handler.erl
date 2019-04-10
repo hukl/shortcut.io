@@ -36,6 +36,23 @@ handle_request(<<"GET">>, [], Request, #session{ user_id = UserId }) ->
     {ok, 200, #{<<"content-type">> => <<"application/json">>}, JsonResponse, Request};
 
 
+handle_request(<<"GET">>, [<<"filter">>], Request, #session{ user_id = UserId }) ->
+    Queries   = cowboy_req:parse_qs(Request),
+    TagString = proplists:get_value(<<"tags">>, Queries),
+    TagList   = binary:split(TagString, <<",">>),
+
+    {ok, Shortcuts} = scio_shortcut:filter_by_tags(jiffy:encode(TagList)),
+
+    MapFun = fun(Shortcut) ->
+        scio_shortcut:to_map(Shortcut)
+    end,
+
+    ShortcutList = lists:map(MapFun, Shortcuts),
+    JsonResponse = jiffy:encode(ShortcutList),
+
+    {ok, 200, #{<<"content-type">> => <<"application/json">>}, JsonResponse, Request};
+
+
 handle_request(<<"GET">>, [ShortcutId], Request, #session{ user_id = UserId }) ->
     {ok, Shortcut} = scio_shortcut:find(
         UserId, erlang:binary_to_integer(ShortcutId)

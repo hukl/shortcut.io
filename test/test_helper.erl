@@ -40,6 +40,9 @@ log_in_user() ->
 
 
 create_shortcut_fixtures(UserId) ->
+    create_shortcut_fixtures(UserId, #{}).
+
+create_shortcut_fixtures(UserId, OptionalParams) ->
     Url = "http://foo.com/" ++ erlang:integer_to_list(rand:uniform(1000000)),
 
     Params = #{
@@ -47,7 +50,9 @@ create_shortcut_fixtures(UserId) ->
         <<"title">>       => <<"foo">>,
         <<"description">> => <<"bar">>,
         <<"user_id">>     => UserId,
-        <<"tags">>        => jiffy:encode([])
+        <<"tags">>        => []
     },
 
-    scio_shortcut:create(Params).
+    NewParams = maps:merge(Params, OptionalParams),
+
+    scio_shortcut:create(NewParams).

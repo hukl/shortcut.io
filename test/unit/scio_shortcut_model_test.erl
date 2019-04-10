@@ -63,3 +63,21 @@ test_update_shortcut() ->
     ?assert_equal(<<"Neue Beschreibung">>,           UpdatedShortcut#shortcut.description),
     ?assert_equal(1,                                 UpdatedShortcut#shortcut.user_id),
     ?assert_equal([<<"foo">>, <<"bar">>, <<"baz">>], UpdatedShortcut#shortcut.tags).
+
+
+test_filter_by_tags_when_no_shortcuts_are_tagged() ->
+    test_helper:create_shortcut_fixtures(1),
+    ?assert_equal({ok, []}, scio_shortcut:filter_by_tags(jiffy:encode([<<"programming">>]))).
+
+
+test_filter_by_tags_when_one_shortcut_tag_matches() ->
+    test_helper:create_shortcut_fixtures(1, #{<<"tags">> => [<<"programming">>,<<"it">>]}),
+    test_helper:create_shortcut_fixtures(1, #{<<"tags">> => [<<"it">>]}),
+
+    {ok, Result1} = scio_shortcut:filter_by_tags(jiffy:encode([<<"it">>])),
+    ?assert_match([#shortcut{}, #shortcut{}], Result1),
+    ?assert_equal(2, length(Result1)),
+
+    {ok, Result2} = scio_shortcut:filter_by_tags(jiffy:encode([<<"programming">>,<<"it">>])),
+    ?assert_match([#shortcut{}], Result2),
+    ?assert_equal(1, length(Result2)).

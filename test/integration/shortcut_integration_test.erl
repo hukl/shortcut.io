@@ -224,3 +224,35 @@ test_updating_a_shortcut_of_a_different_user_should_fail() ->
     ?assert_equal(OldShortcut#shortcut.title, Shortcut#shortcut.title),
     ?assert_equal(OldShortcut#shortcut.description, Shortcut#shortcut.description),
     ?assert_equal(OldShortcut#shortcut.tags, Shortcut#shortcut.tags).
+
+
+test_filter_by_tags() ->
+    #etest_http_res{ headers = LoginHeaders} = test_helper:log_in_user(),
+
+    Tags = [
+        [<<"programming">>, <<"english">>],
+        [<<"foo">>, <<"bar">>],
+        [<<"english">>, <<"news">>],
+        [<<"bar">>, <<"programming">>, <<"it">>],
+        [<<"nix">>, <<"nada">>, <<"niente">>]
+    ],
+
+    EachFun = fun(Taglist) ->
+        test_helper:create_shortcut_fixtures(1, #{ <<"tags">> => Taglist })
+    end,
+    lists:foreach(EachFun, Tags),
+
+    Cookie  = proplists:get_value("set-cookie", LoginHeaders),
+    Url     = ?BASE_URL ++ "/shortcuts/filter",
+    Headers = [
+        {"content-type", "application/json"},
+        {"cookie",       Cookie}
+    ],
+
+    Query = [{"tags", "programming,it"}],
+    Res = ?perform_get(Url, Headers, Query),
+    ?assert_status(200, Res),
+
+    % [#{}, #{}, ...]
+    ResJson = jiffy:decode(Res#etest_http_res.body, [return_maps]),
+    ?assert_equal(1, length(ResJson)).
