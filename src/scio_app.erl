@@ -22,7 +22,6 @@ start(_StartType, _StartArgs) ->
     application:ensure_all_started(cowboy),
 
     initialize_cowboy(),
-    scio_config:load_secrets(),
 
     scio_sup:start_link().
 

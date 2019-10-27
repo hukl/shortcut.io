@@ -47,7 +47,7 @@ init([]) ->
 
 
 pg_poolboy_spec() ->
-    {ok, Pools} = scio_config:db(),
+    {ok, Pools} = application:get_env(scio, pg_pools),
     [DefaultSpec|_] = lists:map(fun({Name, SizeArgs, WorkerArgs}) ->
         PoolArgs = [{name, {local, Name}},
                     {worker_module, scio_sql_worker}] ++ SizeArgs,
