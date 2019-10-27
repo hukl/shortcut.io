@@ -8,8 +8,7 @@
 -include("scio.hrl").
 
 before_suite() ->
-    scio_config:load_secrets().
-
+    ok.
 
 test_new_session() ->
     User = #user{

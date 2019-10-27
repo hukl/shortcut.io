@@ -85,5 +85,5 @@ validate_session_id(Secret, SessionIdWithSignature) ->
 
 
 cookie_secret() ->
-    {ok, [Secrets]} = application:get_env(scio, secrets),
-    proplists:get_value(cookie_secret, Secrets).
+    {ok, CookieSecret} = application:get_env(scio, cookie_secret),
+    CookieSecret.
