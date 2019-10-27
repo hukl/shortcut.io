@@ -18,7 +18,6 @@ _build
 rebar3.crashdump
 *~
 .DS_Store
-database.config
 tags
 coverage
-secrets.config
+config/*.config
