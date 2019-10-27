@@ -29,5 +29,4 @@ crypt_password(Password) ->
 -spec check_password(bitstring(), bitstring()) -> boolean().
 check_password(Password, CryptedPassword) ->
     StringPassword = erlang:bitstring_to_list(CryptedPassword),
-
     {ok, StringPassword} =:= bcrypt:hashpw(Password, StringPassword).

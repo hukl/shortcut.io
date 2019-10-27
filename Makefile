@@ -14,7 +14,10 @@ shell:
 	ERL_FLAGS=" -config config/development.config" rebar3 shell
 
 dev:
-	rebar3 release && _build/default/rel/development/bin/development console
+	rebar3 release -n development && _build/default/rel/development/bin/development console
+
+release:
+	rebar3 release -n production
 
 dialyzer:
 	rebar3 dialyzer
@@ -32,4 +35,3 @@ schema_load_test:
 
 schema_load_production:
 	psql -h localhost -d shortcut_production < priv/db/schema.sql
-

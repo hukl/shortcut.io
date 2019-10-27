@@ -6,12 +6,17 @@
   {applications,
    [kernel,
     stdlib,
+    syntax_tools,
+    compiler,
     crypto,
     bcrypt,
     sasl,
+    bbmustache,
+    nested,
     cowboy,
     poolboy,
-    epgsql
+    epgsql,
+    jiffy
    ]},
   {env,[]},
   {modules, []},
