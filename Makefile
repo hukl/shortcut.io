@@ -19,9 +19,6 @@ dev:
 production:
 	rebar3 release -n production
 
-release:
-	rebar3 release -n production
-
 dialyzer:
 	rebar3 dialyzer
 
