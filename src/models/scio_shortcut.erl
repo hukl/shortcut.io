@@ -20,8 +20,8 @@
     "user_id, "
     "screenshot_id, "
     "tags, "
-    "EXTRACT(EPOCH FROM created_at) * 1000000 as created_at, "
-    "EXTRACT(EPOCH FROM created_at) * 1000000 as updated_at "
+    "EXTRACT(EPOCH FROM created_at) as created_at, "
+    "EXTRACT(EPOCH FROM created_at) as updated_at "
 ).
 
 
@@ -142,6 +142,6 @@ row_to_record({Id, Url, Title, Description, UId, ScreenshotId, Tags, CreatedAt, 
         user_id         = UId,
         screenshot_id   = ScreenshotId,
         tags            = jiffy:decode(Tags, [return_maps]),
-        created_at      = CreatedAt,
-        updated_at      = UpdatedAt
+        created_at      = erlang:trunc(CreatedAt),
+        updated_at      = erlang:trunc(UpdatedAt)
     }.
