@@ -16,6 +16,9 @@ shell:
 dev:
 	rebar3 release -n development && _build/default/rel/development/bin/development console
 
+production:
+	rebar3 release -n production
+
 release:
 	rebar3 release -n production
 
