@@ -16,8 +16,7 @@
     cowboy,
     poolboy,
     epgsql,
-    jiffy,
-    uuid
+    jiffy
    ]},
   {env,[]},
   {modules, []},

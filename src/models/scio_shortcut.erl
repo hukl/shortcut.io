@@ -83,7 +83,7 @@ find(ShortcutId, UserId) ->
     {ok, row_to_record(Row)}.
 
 
--spec update(integer(), integer(), map()) -> {ok, integer()}.
+-spec update(integer(), integer(), map()) -> {ok, #shortcut{}} | {error, term()}.
 update(ShortcutId, UserId, #{<<"url">> := Url, <<"title">> := Title, <<"description">> := Description, <<"tags">> := Tags}) ->
     Query = "UPDATE shortcuts "
             "SET (url, title, description, tags) = ($1, $2, $3, $4) "
