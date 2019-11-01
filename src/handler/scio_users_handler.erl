@@ -12,25 +12,12 @@ handle_request(<<"POST">>, [], Request, _) ->
         {ok, _User} ->
             {ok, 201, #{<<"location">> => <<"/">>}, <<"CREATE">>, Request};
         {error, email_already_exists} ->
-            Message = #{
-              <<"ok">>    => <<"false">>,
-              <<"error">> => <<"Email Address already exists">>
-            },
-            {ok, 400, #{<<"content-type">> => <<"application/json">>}, jiffy:encode(Message), Request};
+            scio_default_handler:error_response(400, <<"Email Address already exists">>, Request);
         {error, Reason} ->
             logger:error("Unexpected Error: ~p~n", [Reason]),
-            Message = #{
-              <<"ok">>    => <<"false">>,
-              <<"error">> => <<"An unexpected error has occurred">>
-            },
-            {ok, 400, #{<<"content-type">> => <<"application/json">>}, jiffy:encode(Message), Request}
+            scio_default_handler:error_response(400, <<"Bad Request">>, Request)
     end;
 
 
-handle_request(<<"GET">>, [<<"new">>], Request, _) ->
-    Body = user_new_view:render(#{}),
-    {ok, 200, #{}, Body, Request};
-
-
 handle_request(_, _, Request, _) ->
-    {ok, 404, #{}, <<"NOT FOUND">>, Request}.
+    scio_default_handler:error_response(404, <<"Not Found">>, Request).

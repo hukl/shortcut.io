@@ -1,6 +1,6 @@
 -module(scio_default_handler).
 
--export([init/2]).
+-export([init/2, error_response/3]).
 
 -include("scio.hrl").
 
@@ -17,9 +17,26 @@ init(#{ method := Method, path := Path} = Request, State) ->
         Method, PathSegments, Request, Session
     ),
 
-    Response = render_html(Status, Headers, Body, NewRequest),
+    Response = render_response(Status, Headers, Body, NewRequest),
 
     {ok, Response, State}.
+
+
+-spec error_response(integer(), bitstring(), cowboy_req:req()) -> cowboy_req:req().
+error_response(Status, Message, Request) ->
+    ResponseBody = #{
+      <<"ok">>    => <<"false">>,
+      <<"error">> => Message
+    },
+
+    Res = cowboy_req:reply(
+        Status,
+        #{},
+        jiffy:encode(ResponseBody),
+        Request
+    ),
+
+    Res.
 
 
 % ##############################################################################
@@ -31,19 +48,6 @@ init(#{ method := Method, path := Path} = Request, State) ->
     list(),
     cowboy:req(),
     #session{} | 'undefined') -> {'ok', integer(), map(), bitstring(), cowboy:req()}.
-
-handle_request(<<"GET">>, [] , Request, _) ->
-    Body = landing_page_view:render(
-        #{
-             <<"greeting">> => <<"hello world">>,
-             <<"names">>    => [
-                #{<<"name">> => <<"alice">>},
-                #{<<"name">> => <<"bob">>}
-            ]
-        }
-    ),
-
-    {ok, 200, #{}, Body, Request};
 
 
 handle_request(Method, [<<"users">>|Path], Request, Session) ->
@@ -57,52 +61,22 @@ handle_request(Method, [<<"shortcuts">>|Path], Request, Session) ->
 
 
 handle_request(<<"GET">>, [<<"health">>], Request, _) ->
-    {ok, 200, #{}, <<"OK">>, Request};
+    {ok, 200, #{<<"content-type">> => <<"text/plain">>}, <<"OK">>, Request};
 
 handle_request(_, _, Request, _) ->
-    Body = <<"NOT FOUND">>,
-
-    cowboy_req:reply(
-        404,
-        #{<<"content-type">> => <<"text/plain">>},
-        Body,
-        Request
-    ).
-
+    error_response(400, <<"Not Found">>, Request).
 
 % ##############################################################################
 % # Internal API                                                               #
 % ##############################################################################
 
-
-render_html(Status, #{<<"content-type">> := <<"application/json">>} = Headers, Body, Request) ->
-    cowboy_req:reply(
-        Status,
-        Headers,
-        Body,
-        Request
-    );
-
-
-render_html(Status, Headers, Body, Request) ->
-    Session = case cowboy_req:binding(session, Request) of
-        undefined -> <<"Not logged in">>;
-        _         -> <<"You're logged in!">>
-    end,
-
-    Html = layout_view:render(
-        #{
-             <<"body">>    => Body,
-             <<"session">> => Session
-         }
-    ),
-
-    DefaultHeader = #{<<"content-type">> => <<"text/html">>},
+render_response(Status, Headers, Body, Request) ->
+    DefaultHeader = #{<<"content-type">> => <<"application/json">>},
     NewHeaders    = maps:merge(DefaultHeader, Headers),
 
     cowboy_req:reply(
         Status,
         NewHeaders,
-        Html,
+        Body,
         Request
     ).

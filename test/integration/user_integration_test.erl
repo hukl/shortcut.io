@@ -21,12 +21,6 @@ after_suite() ->
     application:stop(scio).
 
 
-test_signup_page() ->
-    Url = ?BASE_URL ++ "/users/new",
-    Res = ?perform_get(Url),
-
-    ?assert_status(200, Res).
-
 
 test_submitting_valid_form_should_create_user() ->
     Url     = ?BASE_URL ++ "/users/",
@@ -74,13 +68,6 @@ test_signing_up_with_existing_user_name() ->
     Response = ?perform_post(Url, Headers, Json, []),
 
     ?assert_status(400, Response).
-
-
-test_log_in_page() ->
-    Url = ?BASE_URL ++ "/sessions/new",
-    Res = ?perform_get(Url),
-
-    ?assert_status(200, Res).
 
 
 test_successful_log_in() ->
@@ -157,10 +144,10 @@ test_login_and_stay_logged_in() ->
     ResHeaders = Res#etest_http_res.headers,
     Cookie     = proplists:get_value("set-cookie", ResHeaders),
 
-    UrlNew = ?BASE_URL ++ "/",
+    UrlNew = ?BASE_URL ++ "/shortcuts",
     ResNew = ?perform_get(UrlNew, [{"cookie", Cookie}]),
 
-    ?assert_body_contains("You're logged in", ResNew).
+    ?assert_status(200, ResNew).
 
 
 test_not_found() ->

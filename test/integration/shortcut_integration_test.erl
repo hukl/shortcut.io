@@ -217,7 +217,7 @@ test_updating_a_shortcut_of_a_different_user_should_fail() ->
     },
     ReqJson = jiffy:encode(Params),
     Res2 = ?perform_put(Url, Headers, ReqJson, []),
-    ?assert_status(403, Res2),
+    ?assert_status(404, Res2),
 
     {ok, Shortcut} = scio_shortcut:find(1, 42),
     ?assert_equal(OldShortcut#shortcut.url, Shortcut#shortcut.url),

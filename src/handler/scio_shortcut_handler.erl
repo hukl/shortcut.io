@@ -5,8 +5,9 @@
 -include("scio.hrl").
 
 
+% No Session
 handle_request(_, _, Request, undefined) ->
-    {ok, 403, #{}, <<"Forbidden">>, Request};
+    scio_default_handler:error_response(403, <<"Forbidden">>, Request);
 
 
 handle_request(<<"POST">>, [], Request, Session) ->
@@ -20,7 +21,7 @@ handle_request(<<"POST">>, [], Request, Session) ->
             spawn(scio_screenshot, fetch_url, [Shortcut]),
             {ok, 201, #{<<"location">> => <<"/">>}, <<"ok">>, Request};
         {error, _Reason} ->
-            {ok, 400, #{}, <<"Bad Request">>, Request}
+            scio_default_handler:error_response(400, <<"Bad Request">>, Request)
     end;
 
 
@@ -34,7 +35,7 @@ handle_request(<<"GET">>, [], Request, #session{ user_id = UserId }) ->
     ShortcutList = lists:map(MapFun, Shortcuts),
     JsonResponse = jiffy:encode(ShortcutList),
 
-    {ok, 200, #{<<"content-type">> => <<"application/json">>}, JsonResponse, Request};
+    {ok, 200, #{}, JsonResponse, Request};
 
 
 handle_request(<<"GET">>, [ShortcutId], Request, #session{ user_id = UserId }) ->
@@ -45,7 +46,7 @@ handle_request(<<"GET">>, [ShortcutId], Request, #session{ user_id = UserId }) -
     Response     = scio_shortcut:to_map(Shortcut),
     JsonResponse = jiffy:encode(Response),
 
-    {ok, 200, #{<<"content-type">> => <<"application/json">>}, JsonResponse, Request};
+    {ok, 200, #{}, JsonResponse, Request};
 
 
 handle_request(<<"PUT">>, [ShortcutId], Request, #session{ user_id = UserId }) ->
@@ -59,9 +60,9 @@ handle_request(<<"PUT">>, [ShortcutId], Request, #session{ user_id = UserId }) -
             Response     = scio_shortcut:to_map(Shortcut),
             JsonResponse = jiffy:encode(Response),
 
-            {ok, 200, #{<<"content-type">> => <<"application/json">>}, JsonResponse, Request};
+            {ok, 200, #{}, JsonResponse, Request};
         {error, no_record_found} ->
-            {ok, 403, #{}, <<"Forbidden">>, Request};
+            scio_default_handler:error_response(404, <<"Not Found">>, Request);
         {error, _} ->
-            {ok, 400, #{}, <<"Bad Request">>, Request}
+            scio_default_handler:error_response(400, <<"Bad Request">>, Request)
     end.

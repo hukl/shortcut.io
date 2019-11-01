@@ -35,10 +35,3 @@ test_health_check() ->
     Res = ?perform_get(Url),
 
     ?assert_status(200, Res).
-
-
-test_index_page() ->
-    Url = "http://localhost:9090/",
-    Res = ?perform_get(Url),
-
-    ?assert_status(200, Res).

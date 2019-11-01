@@ -15,8 +15,6 @@
 %%====================================================================
 
 start(_StartType, _StartArgs) ->
-    scio_view:load_templates(),
-
     application:start(cowlib),
     application:start(ranch),
     application:ensure_all_started(cowboy),

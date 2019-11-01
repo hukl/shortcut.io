@@ -14,17 +14,12 @@ handle_request(<<"POST">>, [], Request, _) ->
         {ok, NewRequest} ->
             {ok, 201, #{<<"location">> => <<"/">>}, <<"Login Success">>, NewRequest};
         {error, _Reason} ->
-            {ok, 403, #{}, <<"Forbidden">>, Request}
+            scio_default_handler:error_response(403, <<"Forbidden">>, Request)
     end;
 
 
-handle_request(<<"GET">>, [<<"new">>], Request, _) ->
-    Body = session_new_view:render(#{}),
-    {ok, 200, #{}, Body, Request};
-
-
 handle_request(_, _, Request, _) ->
-    {ok, 404, #{}, <<"NOT FOUND">>, Request}.
+    scio_default_handler:error_response(404, <<"Not Found">>, Request).
 
 
 
