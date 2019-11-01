@@ -39,15 +39,14 @@ create(#{
     <<"tags">>          := Tags} = _Params) ->
 
     Query = "INSERT INTO shortcuts "
-             "    (url, title, description, screenshot_id, user_id, tags) "
+             "    (url, title, description, user_id, tags) "
              "VALUES  "
-             "    ($1, $2, $3, $4, $5, $6) "
+             "    ($1, $2, $3, $4, $5) "
              "RETURNING " ++ ?SHORTCUT_COLUMNS,
 
     JsonTags     = jiffy:encode(Tags),
-    ScreenShotId = uuid:to_string(uuid:uuid4()),
 
-    case scio_sql:equery(pg, Query, [Url, Title, Description, ScreenShotId, UserId, JsonTags]) of
+    case scio_sql:equery(pg, Query, [Url, Title, Description, UserId, JsonTags]) of
         {ok, _Count, _Colums, [Row]}->
             {ok, row_to_record(Row)};
         {error, Error} ->

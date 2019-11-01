@@ -1,13 +1,8 @@
 {"1.1.0",
-[{<<"bbmustache">>,{pkg,<<"bbmustache">>,<<"1.6.1">>},0},
- {<<"bcrypt">>,{pkg,<<"bcrypt">>,<<"1.0.2">>},0},
+[{<<"bcrypt">>,{pkg,<<"bcrypt">>,<<"1.0.2">>},0},
  {<<"cowboy">>,{pkg,<<"cowboy">>,<<"2.6.1">>},0},
  {<<"cowlib">>,{pkg,<<"cowlib">>,<<"2.7.0">>},1},
  {<<"epgsql">>,{pkg,<<"epgsql">>,<<"4.2.1">>},0},
- {<<"erlang_uuid">>,
-  {git,"https://github.com/avtobiff/erlang-uuid.git",
-       {ref,"cb02a2039a9b29dd2eef0446039c9c6e164df9ef"}},
-  0},
  {<<"etest">>,{pkg,<<"etest">>,<<"1.2.1">>},0},
  {<<"etest_http">>,{pkg,<<"etest_http">>,<<"1.0.2">>},0},
  {<<"jiffy">>,{pkg,<<"jiffy">>,<<"0.15.2">>},1},
@@ -17,7 +12,6 @@
  {<<"ranch">>,{pkg,<<"ranch">>,<<"1.7.1">>},1}]}.
 [
 {pkg_hash,[
- {<<"bbmustache">>, <<"9FB63FA60BD53AFBF47F02E6D8BD6B2BEAFC068E02E20975254DC7461FD4F397">>},
  {<<"bcrypt">>, <<"6735F66D3A7309AF166CE660161009B7D9B9216508B8B2E6A0A9090AF35CB757">>},
  {<<"cowboy">>, <<"F2E06F757C337B3B311F9437E6E072B678FCD71545A7B2865BDAA154D078593F">>},
  {<<"cowlib">>, <<"3EF16E77562F9855A2605900CEDB15C1462D76FB1BE6A32FC3AE91973EE543D2">>},

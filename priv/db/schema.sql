@@ -73,7 +73,7 @@ CREATE TABLE public.shortcuts (
     url text NOT NULL,
     title character varying(100),
     description text,
-    screenshot_id uuid NOT NULL,
+    screenshot_id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
     user_id integer NOT NULL,
     tags jsonb,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
