@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 11.1
--- Dumped by pg_dump version 11.1
+-- Dumped from database version 11.5
+-- Dumped by pg_dump version 11.5
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -12,6 +12,7 @@ SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
 SET check_function_bodies = false;
+SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
@@ -29,6 +30,7 @@ DROP SEQUENCE public.users_id_seq;
 DROP TABLE public.users;
 DROP SEQUENCE public.shortcuts_id_seq;
 DROP TABLE public.shortcuts;
+DROP EXTENSION "uuid-ossp";
 DROP EXTENSION pgcrypto;
 --
 -- Name: pgcrypto; Type: EXTENSION; Schema: -; Owner: 
@@ -44,6 +46,20 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
 COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
 
 
+--
+-- Name: uuid-ossp; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION "uuid-ossp"; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION "uuid-ossp" IS 'generate universally unique identifiers (UUIDs)';
+
+
 SET default_tablespace = '';
 
 SET default_with_oids = false;
@@ -57,7 +73,7 @@ CREATE TABLE public.shortcuts (
     url text NOT NULL,
     title character varying(100),
     description text,
-    screenshot_id character varying(255),
+    screenshot_id uuid NOT NULL,
     user_id integer NOT NULL,
     tags jsonb,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,

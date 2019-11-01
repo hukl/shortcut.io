@@ -16,7 +16,8 @@ handle_request(<<"POST">>, [], Request, Session) ->
     ParamsWithUserId = maps:put(<<"user_id">>, Session#session.user_id, Params),
 
     case scio_shortcut:create(ParamsWithUserId) of
-        {ok, _} ->
+        {ok, Shortcut} ->
+            spawn(scio_screenshot, fetch_url, [Shortcut]),
             {ok, 201, #{<<"location">> => <<"/">>}, <<"ok">>, Request};
         {error, _Reason} ->
             {ok, 400, #{}, <<"Bad Request">>, Request}

@@ -17,8 +17,8 @@
     "url, "
     "title, "
     "description, "
-    "user_id, "
     "screenshot_id, "
+    "user_id, "
     "tags, "
     "EXTRACT(EPOCH FROM created_at) as created_at, "
     "EXTRACT(EPOCH FROM created_at) as updated_at "
@@ -32,21 +32,22 @@
 
 -spec create(#{ bitstring() => bitstring() | integer() }) -> {'ok', #shortcut{}} | {'error', term()}.
 create(#{
-    <<"url">>         := Url,
-    <<"title">>       := Title,
-    <<"description">> := Description,
-    <<"user_id">>     := UserId,
-    <<"tags">>        := Tags} = _Params) ->
+    <<"url">>           := Url,
+    <<"title">>         := Title,
+    <<"description">>   := Description,
+    <<"user_id">>       := UserId,
+    <<"tags">>          := Tags} = _Params) ->
 
     Query = "INSERT INTO shortcuts "
-             "    (url, title, description, user_id, tags) "
+             "    (url, title, description, screenshot_id, user_id, tags) "
              "VALUES  "
-             "    ($1, $2, $3, $4, $5) "
+             "    ($1, $2, $3, $4, $5, $6) "
              "RETURNING " ++ ?SHORTCUT_COLUMNS,
 
-    JsonTags = jiffy:encode(Tags),
+    JsonTags     = jiffy:encode(Tags),
+    ScreenShotId = uuid:to_string(uuid:uuid4()),
 
-    case scio_sql:equery(pg, Query, [Url, Title, Description, UserId, JsonTags]) of
+    case scio_sql:equery(pg, Query, [Url, Title, Description, ScreenShotId, UserId, JsonTags]) of
         {ok, _Count, _Colums, [Row]}->
             {ok, row_to_record(Row)};
         {error, Error} ->
@@ -133,14 +134,14 @@ to_map(Shortcut) ->
 %% ===================================================================
 
 
-row_to_record({Id, Url, Title, Description, UId, ScreenshotId, Tags, CreatedAt, UpdatedAt}) ->
+row_to_record({Id, Url, Title, Description, ScreenshotId, UId, Tags, CreatedAt, UpdatedAt}) ->
     #shortcut{
         id              = Id,
         url             = Url,
         title           = Title,
         description     = Description,
-        user_id         = UId,
         screenshot_id   = ScreenshotId,
+        user_id         = UId,
         tags            = jiffy:decode(Tags, [return_maps]),
         created_at      = erlang:trunc(CreatedAt),
         updated_at      = erlang:trunc(UpdatedAt)

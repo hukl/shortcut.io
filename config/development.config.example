@@ -11,6 +11,8 @@
             % Generate in EShell with io:format("~p~n", [base64:encode(crypto:strong_rand_bytes(128))]).
             cookie_secret, <<"">>
         },
+        {screenshot_path, "/tmp"},
+        {puppeteer_file, "index_dev.js"},
         {pg_pools, [
             {pg, [
                 {size, 10},

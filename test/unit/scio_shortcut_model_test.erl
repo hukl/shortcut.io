@@ -62,4 +62,5 @@ test_update_shortcut() ->
     ?assert_equal(<<"Neuer Titel">>,                 UpdatedShortcut#shortcut.title),
     ?assert_equal(<<"Neue Beschreibung">>,           UpdatedShortcut#shortcut.description),
     ?assert_equal(1,                                 UpdatedShortcut#shortcut.user_id),
-    ?assert_equal([<<"foo">>, <<"bar">>, <<"baz">>], UpdatedShortcut#shortcut.tags).
+    ?assert_equal([<<"foo">>, <<"bar">>, <<"baz">>], UpdatedShortcut#shortcut.tags),
+    ?assert(uuid:is_valid(erlang:binary_to_list(UpdatedShortcut#shortcut.screenshot_id))).
