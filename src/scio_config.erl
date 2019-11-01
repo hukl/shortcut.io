@@ -8,7 +8,5 @@ config_dir() ->
 
 
 env() ->
-    {ok,[[Path]]} = init:get_argument(config),
-    {ok, RegExp}  = re:compile("config\/(\\w+).config$"),
-    {match,[Env]} = re:run(Path, RegExp, [{capture, all_but_first, binary}]),
-    erlang:binary_to_list(Env).
+    {ok, Env} = application:get_env(scio, env),
+    Env.

@@ -6,6 +6,7 @@
     ]},
 
     {scio, [
+        {env, development},
         {http_port, 8080},
         {
             % Generate in EShell with io:format("~p~n", [base64:encode(crypto:strong_rand_bytes(128))]).

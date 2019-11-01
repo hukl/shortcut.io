@@ -7,4 +7,4 @@
 -include_lib("etest/include/etest.hrl").
 
 test_env() ->
-    ?assert_equal("test", scio_config:env()).
+    ?assert_equal(test, scio_config:env()).

@@ -32,8 +32,8 @@ fetch_url(Shortcut) ->
     ],
 
     case scio_config:env() of
-        "test" -> ok;
-        _      -> process_url(Operations)
+        test -> ok;
+        _    -> process_url(Operations)
     end.
 
 
