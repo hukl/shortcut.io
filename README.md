@@ -121,3 +121,35 @@ Body: [
         { … }
     ]
 ```
+
+### Update Shortcut
+```
+# REQUEST
+
+PUT /shortcuts/[id]
+
+{
+    url         : [string],
+    title       : [string],
+    description : [string],
+    tags        : [ [string], [string], … ]
+}
+
+# RESPONSE
+
+Status: 200
+Body: [
+        {
+            "id"            : 1,
+            "url"           : "http://foo.com",
+            "title"         : "Best Website ever",
+            "description"   : "What more can I say",
+            "screenshot_id" : "cc12c780-fa52-11e9-ae38-0023dfdf2726",
+            "tags"          : ["foo", "bar", "baz"],
+            "created_at"    : 1572360698,
+            "updated_at"    : 1572360698
+        },
+        { … }
+    ]`
+
+```
