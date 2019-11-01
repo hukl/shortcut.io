@@ -76,12 +76,9 @@ handle_request(_, _, Request, _) ->
 
 
 render_html(Status, #{<<"content-type">> := <<"application/json">>} = Headers, Body, Request) ->
-
-    AccessHeaders = maps:put(<<"access-control-allow-origin">>, <<"*">>, Headers),
-
     cowboy_req:reply(
         Status,
-        AccessHeaders,
+        Headers,
         Body,
         Request
     );
