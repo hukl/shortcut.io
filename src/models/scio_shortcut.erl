@@ -6,6 +6,7 @@
     find_all_by_user_id/1,
     find/2,
     update/3,
+    delete/2,
     to_map/1
 ]).
 
@@ -97,6 +98,20 @@ update(ShortcutId, UserId, #{<<"url">> := Url, <<"title">> := Title, <<"descript
             {ok, row_to_record(Row)};
         {ok, 0 , _Columns, _Rows} ->
             {error, no_record_found};
+        {error, Error} ->
+            {error, Error}
+    end.
+
+
+-spec delete(integer(), integer()) -> {'ok', integer()} | {error, term()}.
+delete(ShortcutId, UserId) ->
+    Query = "DELETE FROM shortcuts "
+            "WHERE id = $1 "
+            "AND user_id = $2;",
+
+    case scio_sql:equery(pg, Query, [ShortcutId, UserId]) of
+        {ok, Count} ->
+            {ok, Count};
         {error, Error} ->
             {error, Error}
     end.

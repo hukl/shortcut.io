@@ -224,3 +224,65 @@ test_updating_a_shortcut_of_a_different_user_should_fail() ->
     ?assert_equal(OldShortcut#shortcut.title, Shortcut#shortcut.title),
     ?assert_equal(OldShortcut#shortcut.description, Shortcut#shortcut.description),
     ?assert_equal(OldShortcut#shortcut.tags, Shortcut#shortcut.tags).
+
+
+test_deleting_a_shortcut() ->
+    #etest_http_res{ headers = LoginHeaders} = test_helper:log_in_user(),
+
+    {ok, Shortcut} = test_helper:create_shortcut_fixtures(1),
+    ShortcutId     = erlang:integer_to_list(Shortcut#shortcut.id),
+    ?assert_equal({ok, 1}, scio_shortcut:count()),
+
+    Cookie  = proplists:get_value("set-cookie", LoginHeaders),
+    Url     = ?BASE_URL ++ "/shortcuts/" ++ ShortcutId,
+    Headers = [
+        {"content-type", "application/json"},
+        {"cookie",       Cookie}
+    ],
+
+    Res = ?perform_delete(Url, Headers, []),
+    ?assert_status(201, Res),
+    ?assert_equal({ok, 0}, scio_shortcut:count()).
+
+
+test_deleting_a_shortcut_for_wrong_user() ->
+    #etest_http_res{ headers = LoginHeaders} = test_helper:log_in_user(),
+
+    % Shortcut with a different user Id than the logged in user
+    {ok, Shortcut} = test_helper:create_shortcut_fixtures(42),
+    ShortcutId     = erlang:integer_to_list(Shortcut#shortcut.id),
+
+    ?assert_equal({ok, 1}, scio_shortcut:count()),
+
+    Cookie  = proplists:get_value("set-cookie", LoginHeaders),
+    Url     = ?BASE_URL ++ "/shortcuts/" ++ ShortcutId,
+    Headers = [
+        {"content-type", "application/json"},
+        {"cookie",       Cookie}
+    ],
+
+    Res = ?perform_delete(Url, Headers, []),
+    ?assert_status(404, Res),
+    ?assert_equal({ok, 1}, scio_shortcut:count()).
+
+
+test_deleting_a_shortcut_that_does_not_exist_for_user() ->
+    #etest_http_res{ headers = LoginHeaders} = test_helper:log_in_user(),
+
+    % Right user
+    {ok, Shortcut} = test_helper:create_shortcut_fixtures(1),
+    ShortcutId     = erlang:integer_to_list(Shortcut#shortcut.id + 23), % Wrong ID
+
+    ?assert_equal({ok, 1}, scio_shortcut:count()),
+
+    Cookie  = proplists:get_value("set-cookie", LoginHeaders),
+    Url     = ?BASE_URL ++ "/shortcuts/" ++ ShortcutId,
+    Headers = [
+        {"content-type", "application/json"},
+        {"cookie",       Cookie}
+    ],
+
+    Res = ?perform_delete(Url, Headers, []),
+    ?assert_status(404, Res),
+    ?assert_equal({ok, 1}, scio_shortcut:count()).
+

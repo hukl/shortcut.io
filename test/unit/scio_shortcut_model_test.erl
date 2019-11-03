@@ -63,3 +63,14 @@ test_update_shortcut() ->
     ?assert_equal(<<"Neue Beschreibung">>,           UpdatedShortcut#shortcut.description),
     ?assert_equal(1,                                 UpdatedShortcut#shortcut.user_id),
     ?assert_equal([<<"foo">>, <<"bar">>, <<"baz">>], UpdatedShortcut#shortcut.tags).
+
+
+test_delete_shortcut() ->
+    {ok, Shortcut}  = test_helper:create_shortcut_fixtures(75),
+    ShortcutId      = Shortcut#shortcut.id,
+
+    ?assert_equal({ok, 1}, scio_shortcut:count()),
+
+    {ok, ShortcutId} = scio_shortcut:delete(ShortcutId, 75),
+
+    ?assert_equal({ok, 0}, scio_shortcut:count()).

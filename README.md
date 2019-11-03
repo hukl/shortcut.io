@@ -153,3 +153,15 @@ Body: [
     ]`
 
 ```
+
+### DELETE Shortcut
+```
+# REQUEST
+
+DELETE /shortcuts/[id]
+
+# RESPONSE
+
+Status: 201
+Body:
+```

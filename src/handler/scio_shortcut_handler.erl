@@ -65,4 +65,18 @@ handle_request(<<"PUT">>, [ShortcutId], Request, #session{ user_id = UserId }) -
             scio_default_handler:error_response(404, <<"Not Found">>, Request);
         {error, _} ->
             scio_default_handler:error_response(400, <<"Bad Request">>, Request)
+    end;
+
+
+handle_request(<<"DELETE">>, [ShortcutId], Request, #session{ user_id = UserId }) ->
+    Sid = erlang:binary_to_integer(ShortcutId),
+
+    case scio_shortcut:delete(Sid, UserId) of
+        {ok, 1} ->
+            {ok, 201, #{}, <<"">>, Request};
+        {ok, 0} ->
+            scio_default_handler:error_response(404, <<"Not Found">>, Request);
+        {error, Error} ->
+            logger:error("Deleting a shortcut crashed ~p~n", [Error]),
+            scio_default_handler:error_response(500, <<"Internal Server Error">>, Request)
     end.
