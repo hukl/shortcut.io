@@ -4,7 +4,8 @@
 -export([
     extract_bookmarks/1,
     randomize_dates/1,
-    fetch_screenshots/1
+    fetch_screenshots/1,
+    add_tags/1
 ]).
 
 -spec extract_bookmarks( list() ) -> [ #shortcut{} | 'error' ].
@@ -83,3 +84,44 @@ fetch_screenshots(Shortcuts) ->
     end,
 
     lists:foreach(ScreenshotFun, Shortcuts).
+
+
+add_tags(Shortcuts) ->
+    Query = "UPDATE shortcuts "
+            "SET tags = $1 "
+            "WHERE id = $2;",
+
+    Tags  = [
+        <<"english">>,
+        <<"freebsd">>,
+        <<"audio">>,
+        <<"climate">>,
+        <<"web">>,
+        <<"programming">>,
+        <<"webdevelopment">>,
+        <<"javascript">>,
+        <<"erlang">>,
+        <<"ruby">>,
+        <<"computer">>,
+        <<"apple">>,
+        <<"filesharing">>
+    ],
+
+    RandFun = fun
+        (#shortcut{ id = Id }) ->
+            io:format("YO~n"),
+            TagList       = [lists:nth(I, Tags) || I <- [rand:uniform(13) ||_ <- lists:seq(1, rstats:rpois(2))]],
+            UniqueTagList = sets:to_list(sets:from_list(TagList)),
+            JsonTags      = jiffy:encode(UniqueTagList),
+
+            case scio_sql:equery(pg, Query, [JsonTags, Id]) of
+            {ok, _Count, _Colums, [_Row]} ->
+                io:format("ok");
+            Error ->
+                io:format("Error: ~p~n~n", [Error])
+            end;
+        (_) -> noop
+    end,
+
+    lists:foreach(RandFun, Shortcuts),
+    Shortcuts.

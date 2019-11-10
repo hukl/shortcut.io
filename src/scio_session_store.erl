@@ -12,7 +12,7 @@
 
 -export([save/1, find/1, count/0, validate/1, flush/0, remove/1]).
 
--include("scio.hrl").
+-include("include/scio.hrl").
 
 % Example state record
 % -record(state, { data = {} }).
