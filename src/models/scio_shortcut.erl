@@ -10,7 +10,7 @@
     to_map/1
 ]).
 
--include("scio.hrl").
+-include("include/scio.hrl").
 
 -define(
     SHORTCUT_COLUMNS,
@@ -61,7 +61,7 @@ find_all_by_user_id(UserId) ->
             "FROM shortcuts "
             "WHERE user_id = $1 "
             "ORDER BY created_at DESC "
-            "LIMIT 25;",
+            "LIMIT 40;",
 
     {ok, _Colums, Rows} = scio_sql:equery(pg, Query, [UserId]),
 

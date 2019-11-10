@@ -6,7 +6,7 @@
 
 -export([fetch_url/1]).
 
--include("scio.hrl").
+-include("include/scio.hrl").
 
 -spec fetch_url(#shortcut{}) -> any().
 fetch_url(Shortcut) ->
@@ -54,6 +54,7 @@ fetch_cmd(Url, Path) ->
     ]),
 
     Result = os:cmd(Command),
+    io:format("PUPPETEER ~p~n~n", [Result]),
     logger:debug("Get Screenshot Output: ~p~n", [Result]),
     ok.
 
