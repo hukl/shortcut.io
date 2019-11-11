@@ -48,10 +48,12 @@ init([]) ->
 
 pg_poolboy_spec() ->
     {ok, Pools} = application:get_env(scio, pg_pools),
-    [DefaultSpec|_] = lists:map(fun({Name, SizeArgs, WorkerArgs}) ->
-        PoolArgs = [{name, {local, Name}},
-                    {worker_module, scio_sql_worker}] ++ SizeArgs,
+
+    SpecFun = fun({Name, SizeArgs, WorkerArgs}) ->
+        PoolArgs = [{name, {local, Name}}, {worker_module, scio_sql_worker}] ++ SizeArgs,
         poolboy:child_spec(Name, PoolArgs, WorkerArgs)
-    end, Pools),
+    end,
+
+    [DefaultSpec|_] = lists:map(SpecFun, Pools),
 
     DefaultSpec.
